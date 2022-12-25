@@ -34,6 +34,18 @@ A repo where you can store unstructured data, semi-structured data, and structur
 The Lake house concept emerged due to the limitation of data lakes. It combines the best features of data lakes and data warehouses. The lake house have very similar data structure and data management features as data warehouse, but it sits on top of a low cost cloud storage. Also, you get ACID transactional support so you can ensure consistency. The schema of the data is stored in the Lakehouse meta store. You can evolve the schema of your tables without having ot make a copy of the dataset. You can control and authorize access to your data. 
 
 ## The Modern Data Stack
+SMP (Symmetric multi processing) system contains multiple processors that share the same memory and operate under a single OS. While in a MPP (Massive parallel programming) system, each processor has its own dedicated resources and shares nothing. 
+
+The shift from SMP to MPP was a very critical step towards the modern data stack. Another important step was the decoupling of storage and compute. You can shut down the compute nodes when you don't need them and your data will be safe inside a low cost storage system such as Amazon S3 or Azure blob storage. So if you have a very compute intensive workload, you can just add more compute to your cluster without having to scale the storage.
+
+Another step that contributed to the modern data stack was the introduction of column-oriented databases. ETL -> ELT. 
+
+## Slowly Changing Dimension (SCD)
+
+
+
+
+
 
 
 
