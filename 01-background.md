@@ -41,9 +41,12 @@ The shift from SMP to MPP was a very critical step towards the modern data stack
 Another step that contributed to the modern data stack was the introduction of column-oriented databases. ETL -> ELT. 
 
 ## Slowly Changing Dimension (SCD)
+In some cases, history data might be obsolete or entirely useless. But for some businesses, historic facts might remain relevant in the future (for historical analyses, etc).
 
-
-
+- **SCD Type 0**: Attributes that never change and will not be updated in the data warehouse. e.g., the attribute (column) is no longer useful, like a fax number column is no longer useful. 
+- **SCD Type 1**: The new data overwrites the existing data. e.g., old data is no longer useful, like a flat used to not have air conditioning, but now has it.
+- **SCD Type 2**: Adding a new row for each dimension change in the DWH, additional columns like start time and end time are included. e.g., need to maintain both current and historical data, like the price change of the flat. 
+- **SCD Type 3**: Keeping limited data history (only previous val and current val), adding separate columns for these two. e.g., when keeping some history data is sufficient, like when processing speed is a concern. 
 
 
 
