@@ -2,14 +2,12 @@
 
 ## Prerequisites
 - Snowflake trial account
-- dbt Cloud account
+- dbt Cloud account `https://cloud.getdbt.com/`
 
 ## Load data in to snowflake
 Create objects in snowflake for dbt:
 ```sql
 create warehouse transforming;
-
-create database raw;
 
 create database raw;
 create schema raw.jaffle_shop;
@@ -61,7 +59,6 @@ file_format = (
     field_delimiter = ','
     skip_header = 1
     );
-
 ```
 
 ## Connect dbt Cloud to sf account
