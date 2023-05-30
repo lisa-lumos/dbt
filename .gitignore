@@ -1,1 +1,4 @@
 .DS_Store
+01-dbt-core/code/bin/*
+01-dbt-core/code/include/*
+01-dbt-core/code/lib/*
