@@ -99,6 +99,42 @@ copy into raw_hosts (id, name, is_superhost, created_at, updated_at)
                     field_optionally_enclosed_by = '"');
 ```
 
+Install Python 3.11 from official website. 
+
+Then setup virtual env, and install dbt:
+```console
+(base) lisa@mac16 ~ % /usr/local/bin/python3 -m venv /Users/lisa/Desktop/dbt/01-dbt-core/code # create venv in the "code" folder
+(base) lisa@mac16 code % cd /Users/lisa/Desktop/dbt/01-dbt-core/code
+(base) lisa@mac16 code % source bin/activate # activate the venv
+(code) (base) lisa@mac16 code % python --version ## show the python version of this venv
+Python 3.11.3
+(code) (base) lisa@mac16 code % which pip # see the pip associated with this python version 
+/Users/lisa/Desktop/dbt/01-dbt-core/code/bin/pip
+
+(code) (base) lisa@mac16 code % pip install dbt-snowflake==1.5.0 # install dbt
+(code) (base) lisa@mac16 code % dbt # will show its usage info
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Models
 
 
