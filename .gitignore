@@ -1,5 +1,4 @@
 .DS_Store
-01-dbt-core/code/bin/*
-01-dbt-core/code/include/*
-01-dbt-core/code/lib/*
-01-dbt-core/code/share/*
+01-dbt-core/code/venv/*
+01-dbt-core/code/logs/*
+01-dbt-core/code/dbtlearn/logs/*
