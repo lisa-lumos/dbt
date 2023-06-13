@@ -1144,6 +1144,20 @@ REVIEW_ID                         ...
 ```
 
 ## documentation
+The general idea of documentation in dbt is to keep them as close to the actual source as possible, to prevent your documentation and your analytics code from diverging. 
+
+Documentation can be defined in:
+- yaml files, like "schema.yml"
+- standalone markdown files
+
+dbt ships with a lightweight documentation web server. The landing page uses the "overview.md" file. You can add your own assets, like images, to a special project folder and refer to them. 
+
+
+
+
+
+
+
 
 
 ## Analyses, hooks & exposures
