@@ -325,7 +325,7 @@ select * from final
 ```
 ## Centralizing logic in staging models
 - Staging models (transform the source only; are building blocks that everyone needs)
-- CTEs, or Intermediate models (separating long logic)
+- CTEs, or Intermediate models (separating long/reusable logic)
 - Final model (joins, etc)
 
 Modify the staging CTEs, collapse the repeating work into them, give them good names, and move the staging CTEs out. Refer to them in "models/marts/fct_customer_orders.sql":
@@ -581,9 +581,25 @@ select * from final
 ```
 
 ## Auditing
+To make sure the results match. 
 
+First, ensure both models are up to date.
 
+This example used the `audit_helper` package from dbt hub. 
 
+Create a new statement tab:
+```yml
+{# in dbt Develop #}
 
+  {% set old_etl_relation=ref('customer_orders') -%}
 
+  {% set dbt_relation=ref('fct_customer_orders') %}
+
+  {{ audit_helper.compare_relations(
+      a_relation=old_etl_relation,
+      b_relation=dbt_relation,
+      primary_key="order_id"
+  ) }}
+```
+And preview the results. You can see the "compiled code" tab in the preview area. 
 
