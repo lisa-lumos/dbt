@@ -207,7 +207,7 @@ If you refer to a local dir, it needs to be a relative path to the yml file. Goo
 
 Run `dbt deps` to install these packages specified in that yml file. 
 
-An example using macros in packages:
+### Example: using macros in packages
 ```sql
 -- a week per day, starting from 01/01/2023, to a week later from today
 {{ 
@@ -234,7 +234,8 @@ group by 1,2,3
 
 dbt-utils are written in such a way that it works across different brand of databases. 
 
-An example using models in packages. Example yml file "packages.yml":
+### Example: using models in packages
+Example yml file "packages.yml":
 ```yml
 packages:
   - package: gitlabhq/snowflake_spend
@@ -251,21 +252,91 @@ and run `dbt seed`, then `dbt run`, and you get all the amortized models. These 
 
 To run/test a model from a certain package: `dbt test -m package:snowflake_spend`
 
-
-
-
-
-
-
-
-
-
-
-
 ## Advanced Jinja and Macros
+### Example 1: Grant privilege
+Create a new file "macros/grant_select.sql":
+```sql
+{% macro grant_select(schema=target.schema, role=target.role) %}
 
+  {% set my_query %}
+    grant usage on schema {{ schema }} to role {{ role }};
+    grant select on all tables in schema {{ schema }} to role {{ role }};
+    grant select on all views in schema {{ schema }} to role {{ role }};
+  {% endset %}
 
+  {{ log('Granting select on all tables and views in schema ' ~ schema ~ ' to role ' ~ role, info=True) }} -- info=True makes output goes into both logs and terminal
+  {% do run_query(sql) %}
+  {{ log('Privileges granted. ', info=True) }}
 
+{% endmacro %}
+```
+
+Run `dbt run-operation grant_select` to run this query. 
+
+### Example 2: Use query results to build sql code dynamically
+Create a new macro file "macros/template_example.sql": 
+```sql
+{% macro template_example() %}
+  
+  {% set my_query %}
+    select true as bool
+  {% endset %}
+
+  {% if execute %} 
+    {% set my_results = run_query(my_query).columns[0].values()[0] %}
+    -- columns[0] means select the firs col, values() means get vals of this col
+    {{ log('SQL results ' ~ my_results, info=True) }}
+
+    select 
+      {{ my_results}} as my_new_col,
+      ...
+    from my_table
+  {% endif %}
+{% endmacro %}
+```
+
+Create a new model file "models/template_example_model.sql": 
+```sql
+{{ template_example() }}
+```
+
+`execute == True` in the macro tells dbt to run the query before it compiles. So when we compile the model file, it incorporates the results of the 1st query into the 2nd query.
+
+Another example for this. Create a new macro file "macros/union_tables_by_prefix.sql":
+```sql
+{%- macro union_tables_by_prefix(database, schema, prefix) -%}
+
+  {%- set tables = dbt_utils.get_relations_by_prefix(database=database, schema=schema, prefix=prefix) -%}
+
+  {% for table in tables %} -- loop over each item in the list
+
+      {%- if not loop.first -%}
+      union all 
+      {%- endif %}
+        
+      select * from {{ table.database }}.{{ table.schema }}.{{ table.name }}
+      
+  {% endfor -%}
+  
+{%- endmacro -%}
+```
+
+And the model file "models/union_tables_by_orders_prefix.sql" that uses it:
+```sql
+{{ 
+  union_tables_by_prefix(
+      database='raw',
+      schema='dbt_learn_jinja', 
+      prefix='orders__'
+  )
+}}
+```
+
+Click "compile" in the model page to see the compiled query with unions. 
+
+My note: should read through all macro docs in dbt-utils package. 
+
+### Example 3: Clean stale models
 
 
 
