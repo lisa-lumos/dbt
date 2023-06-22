@@ -176,6 +176,97 @@ Why they used 3 days? Because the goal of incremental models is to approximate t
 What if one particular page view is still going on by the time we already started processing the records? In this case, the page view duration will be under-counted. Maybe it doesn't happen frequent enough for them to be concerned about it. 
 
 What if they want to calculate window functions?
+```sql
+{{
+  config (
+    materialized="incremental",
+    unique_key = 'page_view_id'
+  )
+}}
+
+with events as (
+  select * from {{ source('snowplow', 'events') }}
+  {% if is_incremental() %} 
+  where collector_tstamp >= (
+    select 
+      dateadd('day', -3, max(max_collector_tstamp)) 
+      from {{ this }}
+    ) 
+  {% endif %}
+),
+
+page_views as {
+  select * from events
+  where event = 'page_view'
+},
+
+aggregated_page_events as (
+  select
+    page_view_id,
+    count(*) * 10 as approx_time_on_page, 
+    min(derived_tstamp) as page_view_start,
+    max(collector_tstamp) as max_collector_tstamp
+  from events
+  group by 1
+),
+
+joined as (
+  select *
+  from page_views
+  left join aggregated_page_events using (page_view_id)
+),
+
+indexed as (
+  select 
+    *, 
+    
+    row_number() over (
+      partition by session_id 
+      order by page_view_start
+    ) as page_view_in_session_index,
+
+    row_number() over (
+      partition by anonymous_user_id 
+      order by page_view_start
+    ) as page_view_for_user_index
+
+  from joined
+)
+
+select * from indexed
+```
+
+Run `dbt run -m page_views --full-refresh`, because we added new columns to the model. But this is a incremental model, so the window functions will only be processed for the last 3 days of data, so the data in the table will be wrong. 
+
+They first tried: if a user has a new event, recalculate all page views for that user. It works, but slow. 
+
+Another idea: whenever user has a new session, pull the user's most recent data only, and then perform relative calcs. If they have 1000 page view already, then the 1, 2, 3 page view in the window function, then their real val will be 1 + 1000, 2 + 1000, .... 
+
+For truly massive datasets that are:
+- Always rebuilt past 3 days. Fully ignore late arrivals
+- Always replace data at the partition level
+- No unique keys, because merge is too expensive compared with inserts
+- Targeted look back - no way to do this, too much extra data to scan
+
+These impose different cost-optimization problems. 
+
+When to use incremental model:
+- immutable event streams, append-only, no updates
+- if need to update, have a reliable updated_at field
+
+When not to use incremental model:
+- small data
+- data changes frequently
+- updated unpredictably
+- transformation needs other rows, in which case you should use table/view as materialization
+
+Tradeoffs of incremental models:
+- approximately correct
+- more code complexity
+- if you focus more on correctness, it will hurt performance gains
+
+## Snapshots
+
 
 
 
