@@ -266,12 +266,31 @@ Tradeoffs of incremental models:
 - if you focus more on correctness, it will hurt performance gains
 
 ## Snapshots
+Slowly changing dimensions. Similar to incremental models, but: Snapshots are meant to preserve data in the long run, and never fully refreshed. 
 
+In addition to the 'timestamp' strategy, there is the 'check' strategy:
+```sql
+{% snapshot snap_products %}
 
+{{
+  config(
+    target_database='analytics',
+    target_schema='dbt_lisa_snapshots',
+    unique_key='id',
+    strategy = 'check',
+    check_cols = ['price'], 
+  )
+}}
 
+select id, price from {{ source('jaffle_shop_ext', 'products') }}
 
+{% endsnapshot %}
+```
 
+Useful if you do not have a reliable 'updated_at' field, and only care about changes in price. 
 
+Recommend to use the 'timestamp' strategy whenever possible. Basically pretending to have CDC in the source, which we wish we had. Also, we try to keep the query as simple as possible, because any change in the business logic, is hard to reconcile with the info already in the snapshotted table. 
 
+There are times that it makes sense to snapshot data at the very end of the DAG, after the fact/dim/metrics models. If we have an important metric, which reports to board of directors, or externally to a regulatory agency (need to know when/what we said). In this case, if we make a business logic change, or some other tranformational switch, that causes the amount of daily revenue that we had in the past to be different, we need to know that. 
 
 
