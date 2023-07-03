@@ -105,5 +105,102 @@ where {{ column_name }} <= 5
 
 Overwriting native tests: You can create engineered tests with the same name with the generic tests to override them. This works for all dbt macros. 
 
+## Tests in packages
+
+### dbt_utils
+An example using a test in this package. 
+
+"_core.yml":
+```yml
+...
+
+  - name: orders
+    description: ...
+    tests:
+      - dbt_utils.expression_is_true:
+        expression: "amount" > 5
+```
+
+### dbt_expectations
+An example using a test in this package. 
+"_core.yml":
+```yml
+...
+
+  - name: orders
+    description: ...
+    tests:
+      - dbt_expectations.expect_column_values_to_be_between:
+        min_value: 5
+        row_condition: "order_id is not null"
+        strictly: True
+```
+
+### audit_helper
+Only for the dev env. 
+
+An example using a test in this package. 
+"analysis/audit_helper_compare_relation.sql":
+```sql
+{% set old_etl_relation = ref("orders__deprecated") %}
+{% set dbt_relation = ref("orders") %}
+
+{{ audit_helper.compare_relations(
+    a_relation = old_etl_relation,
+    b_relation = dbt_relation,
+    primary_key = "order_id"
+) }}
+
+```
+
+Preview the results. It shows percentage of match and mismatch. 
+
+"macros/audit_helper_compare_column_values.sql":
+```sql
+{% macro audit_helper_compare_column_values() %}
+    {% set columns_to_compare = adapter.get_columns_in_relation(ref('orders__deprecated')) %}
+
+    {% set old_etl_relation_query %}
+        select * from {{ ref('orders__deprecated') }}
+    {% endset %}
+
+    {% set new_etl_relation_query %}
+        select * from {{ ref('orders') }}
+    {% endset %}
+
+    {% if execute %}
+        {% for column in columns_to_compare %}
+            {{ log('Comparing column "' ~ column.name ~'"', info=True) }}
+            {% set audit_query = audit_helper.compare_column_values(
+                a_query = old_etl_relation_query,
+                b_query = new_etl_relation_query,
+                primary_key = "order_id",
+                column_to_compare = column.name
+            ) %}
+
+            {% set audit_result = run_query(audit_query) %}
+
+            {% do log(audit_results.column_names, info=True) %}
+            {% for row in audit_results.rows %}
+                {% do log(row.values(), info=True) %}
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+{% endmacro %}
+```
+
+Run `dbt run-operation audit_helper_compare_column_values`, 
+
+
+
+
+
+
+
+
+
+
+
+
 
 
