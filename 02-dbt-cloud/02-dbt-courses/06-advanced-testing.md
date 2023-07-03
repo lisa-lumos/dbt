@@ -32,19 +32,78 @@ models:
 
 To run the macro, run `dbt run-operation required_tests`, to test whether all models in the projects have both of the required tests. 
 
+If there is a test that is in the required tests, but you do not need it in a model, you can override it with `{{ config(required_tests=None) }}`. 
+
+You can put `dbt run-operation required_tests` into a CI check, so that each time someone opens oa pull request, this check job kicks off. 
+
+## Test deployment
+When to test:
+- Test in development to ensure pre-existing assumptions
+- Run tests automatically, as an CI check in the PR. `dbt build --models state:modified+`
+- If test returns error, you want to prevent running a pipeline
+- For deployment jobs, run a schedule
+- Test in QA branch before you dbt code reaches main
+
+### Test commands
+`dbt test` runs all tests defined on models/sources/snapshots/seeds. 
+
+`dbt test --select my-model` runs all tests for that model, including generic/singular tests. 
+
+`dbt test --select test_type:singular` runs all singular tests. `dbt test --select test_type:generic` runs all generic tests. 
+
+`dbt test --select my-model test_type:singular` runs all singular tests for that model. 
+
+`dbt test --select source:*` runs all tests defined on all sources. 
+
+When you create a deployment job, the commands inside it runs sequentially. If you run a test on your sources, and if the test fails, the subsequent jobs will not run, which saves cost. An example job:
+```console
+dbt test -s source.*
+dbt run
+dbt test --exclude source:*
+```
+
+`dbt test --select source:jaffle_shop` runs all tests for this source. 
+
+`dbt test --select source:jaffle_shop.orders` runs all test for this source table. 
 
 
+`dbt build --fail-fast` will test a model as soon as it is created, and will stop the job if a model/test went wrong.
 
+`dbt test --store-failures` stores failures (records) of a test into a table for easier debugging. In the System Logs, you can find the select query `select * from some_table` for a failed test that returned records. You just need to execute the query to see the problematic records that caused the test failure. Note that a test's result will always replace previous run failures (truncate and load all the time), so cannot be used to track failures over time. 
 
+## Custom tests
+Custom generic tests: when you want to test the same assumption on many models. 
 
+"tests/generic/assert_column_is_greater_than_five.sql": 
+```sql
+{% test greater_than_five(model, column_name) %}
 
+select {{ column_name }}
+from {{ model }}
+where {{ column_name }} <= 5
 
+{% endtest %}
+```
 
+"models/marts/core/_core.yml":
+```yml
+...
 
+  - name: orders
+    description: ...
 
+    columns:
+      - name: amount
+        description: ...
+        tests: 
+          - assert_column_is_greater_than_five # file name of the test
 
+...
+```
 
+`dbt run --select orders` will run all tests for this model, including this one. 
 
+Overwriting native tests: You can create engineered tests with the same name with the generic tests to override them. This works for all dbt macros. 
 
 
 
