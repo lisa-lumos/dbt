@@ -189,7 +189,7 @@ Preview the results. It shows percentage of match and mismatch.
 {% endmacro %}
 ```
 
-Run `dbt run-operation audit_helper_compare_column_values`, 
+Run `dbt run-operation audit_helper_compare_column_values`, and see the differences. 
 
 
 
