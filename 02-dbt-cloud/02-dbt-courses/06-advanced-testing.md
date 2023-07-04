@@ -178,7 +178,7 @@ Preview the results. It shows percentage of match and mismatch.
                 column_to_compare = column.name
             ) %}
 
-            {% set audit_result = run_query(audit_query) %}
+            {% set audit_results = run_query(audit_query) %}
 
             {% do log(audit_results.column_names, info=True) %}
             {% for row in audit_results.rows %}
@@ -191,16 +191,83 @@ Preview the results. It shows percentage of match and mismatch.
 
 Run `dbt run-operation audit_helper_compare_column_values`, and see the differences. 
 
+## Test configurations
+
+### test configs for generic tests
+"_schema.yml":
+```yml
+version: 2
+
+models:
+  - name: customers
+    description: ...
+    columns:
+      - name: customer_id
+        description: ...
+        tests:
+          - unique
+          - not_null:
+              config: 
+                severity: warn # Note 1
+```
+
+Note 1: When running dbt test, a failed test will prevent downstream tests. Convert it from error to warn, will not affect downstream tests to execute. 
+
+```yml
+              config: 
+                severity: error 
+                error_if: ">100" # Note 2
+```
+Note 2: if there are <= 100 nulls, it will pass; otherwise return error. 
+
+```yml
+              config: 
+                severity: warn 
+                error_if: ">100" 
+                warn_if: ">10" # Note 3
+```
+Note 3: if there are <= 10 nulls, it will pass and return nothing. 
+
+```yml
+              config: 
+                where: "order_date > '2018-03-01'" # Note 4
+```
+Note 4: only test the rows with the specified condition. 
 
 
+```yml
+              config: 
+                limit: 10 # Note 5
+```
+Note 5: reduce the num of returned records for a test. Saves compute. E.g., if 10 failed, I do not need to know more that have failed. 
+
+```yml
+              config: 
+                store_failures: true # Note 6
+                schema: test_failures # optional. Put it into this schema
+```
+Note 6: After running the test, in the logs, find the `select * from ...` statement to see the grouped failed records. 
 
 
+### test configs for singular tests
+Add this to the beginning of the singular test: 
+```sql
+{{
+    config(
+        severity='warn'
+    )
+}}
+```
 
+### project level tests
+Put them into dbt_project.yml file. 
 
-
-
-
-
-
-
+Example:
+```yml
+    tests:
+      jaffle_shop:
+        +severity: warn
+        +store_failure: true
+```
+This sets all model's tests to "warn". 
 
