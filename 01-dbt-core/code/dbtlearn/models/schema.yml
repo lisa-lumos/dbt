@@ -2,15 +2,18 @@ version: 2
 
 models: 
   - name: dim_listings_cleansed # model name
+    description: Cleansed table which contains Airbnb listings # for basic docs
 
     columns: 
 
     - name: listing_id # col name
+      description: Primary key for the listing # for basic docs
       tests: 
         - unique
         - not_null
     
     - name: host_id # col name
+      description: the hosts' id. References the host table. # for basic docs
       tests:
         - not_null
         - relationships: 
@@ -18,6 +21,7 @@ models:
             field: host_id
     
     - name: room_type # col name
+      description: Type of the apartment/room # for basic docs
       tests:
         - accepted_values:
             values: [ # note the indentation here has to be 4
