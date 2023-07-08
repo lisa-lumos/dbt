@@ -1222,14 +1222,86 @@ Press Ctrl+C to exit.
 And the docs webpage will open in your default browser. 
 
 ### Markdown-based docs
+"models/schema.yml":
+```yml
+version: 2
 
+models: 
+  - name: dim_listings_cleansed # model name
+    description: Cleansed table which contains Airbnb listings # for basic docs
 
+    columns: 
 
+    ...
 
+    - name: minimum_nights # col name
+      description: '{{ doc("dim_listing_cleansed__minimum_nights") }}' # for markdown docs, refers to the documentation key
+      tests:
+        - positive_val
+```
 
+"models/docs.md" (or other file name in this folder):
+```md
+{% docs dim_listing_cleansed__minimum_nights %}
+Minimum number of nights required to rent this property. 
 
+Keep in mind that old listings might have `minimum_nights` set to 0 in the source tables. Our cleaning algorithm updates this to `1`. 
 
+{% enddocs %}
+```
 
+The documentation key name is up to you. 
+
+Run `dbt docs generate`, then `dbt docs serve` to see the effect for this col of this table. 
+
+### Redesign the overview page in docs
+"models/overview.md":
+```md
+{% docs __overview__ %}
+# Airbnb pipeline
+Hi, welcome to the Airbnb pipeline documentation!
+
+Here is the schema of our input data:
+![input schema](https://dbtlearn.s3.us-east-2.amazonaws.com/input_schema.png)
+
+{% enddocs %}
+```
+
+Notice the special tag `__overview__`. An image from s3 bucket was attached in there. 
+
+### Include assets such as images to docs
+Create a new folder "assets". "dbt_project.yml", associate the folder with the project:
+```yml
+...
+asset-paths: ["assets"]
+...
+```
+
+Download this image from s3 to the "assets" folder:
+```console
+(venv) (base) lisa@mac16 dbtlearn % curl https://dbtlearn.s3.us-east-2.amazonaws.com/input_schema.png -o assets/input_schema.png
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 66943  100 66943    0     0  88710      0 --:--:-- --:--:-- --:--:-- 89019
+```
+
+"models/overview.md":
+```md
+{% docs __overview__ %}
+# Airbnb pipeline
+Hi, welcome to the Airbnb pipeline documentation!
+
+Here is the schema of our input data:
+![input schema](assets/input_schema.png)
+
+{% enddocs %}
+```
+
+An image from the "assets" folder was attached in there. 
+
+When `dbt docs generate`, the whole assets folder will be copied to target folder, and will be referred by the html. You can also see it `http://localhost:8080/assets/` there in the browser. 
+
+### The Lineage graph (data flow DAG)
 
 
 

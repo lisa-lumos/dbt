@@ -32,5 +32,6 @@ models:
             ]
     
     - name: minimum_nights # col name
+      description: '{{ doc("dim_listing_cleansed__minimum_nights") }}' # for markdown docs
       tests:
         - positive_val
