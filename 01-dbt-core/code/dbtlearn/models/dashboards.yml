@@ -1,0 +1,17 @@
+version: 2
+
+exposures:
+
+  - name: executive_dashboard
+    type: dashboard
+    maturity: low
+    url: https://www.google.com/
+    description: Executive Dashboard about Airbnb listings and hosts
+
+    depends_on:
+      - ref('dim_listings_w_hosts')
+      - ref('full_moon_reviews')
+
+    owner:
+      name: dbt_learner
+      email: dbt_learner@email.com
