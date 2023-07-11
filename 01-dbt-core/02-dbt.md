@@ -1398,6 +1398,35 @@ exposures:
 Generate the docs and you can see the dashboard and its meta data. It will also show up in the DAG.  
 
 ## Debugging tests
+### Great expectations intro
+A library for data testing. Upstream data can change any time, you need to make sure they are as you expected. If the data is not correct, you should know it first, instead of the consumers of your dashboards. 
+
+The dbt package that corresponds with Great Expectations is dbt-expectations: https://github.com/calogica/dbt-expectations. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
