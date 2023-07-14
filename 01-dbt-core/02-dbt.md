@@ -1409,11 +1409,12 @@ There are tests that you can add to yml files, such as:
 - expect for a col, the max val to be between a min/max range
 - expect for a col, the data type to be a certain data type
 - expect num of distinct vals in a col to be a given value
+- expect col vals to match a regex
 - ...
 
 All these tests can take config vals of error/warn. 
 
-
+Note that regex first need to pass jinja, then need to pass snowflake, then winds down to the final regex. 
 
 
 
