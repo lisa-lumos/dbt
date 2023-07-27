@@ -22,8 +22,11 @@ All data at rest on dbt Cloud servers is protected using AES-256 encryption. dbt
 Some data warehouse providers offer advanced security features, that can be leveraged in dbt Cloud. PrivateLink allows supported data platforms on AWS to communicate with dbt Cloud, without the traffic traversing the public internet. Snowflake and BigQuery offer Oauth integration, which adds a layer of security for the data platforms. 
 
 ## Tenancy
+dbt Cloud is available in both single (virtual private) and multi-tenant configurations. 
 
+The Multi Tenant (SaaS) deployment environment refers to the SaaS dbt Cloud application, hosted by dbt Labs. Most commonly used. Managed service. Hosted on AWS. 
 
+Single tenant dbt Cloud instances provide dedicated infrastructure, in a virtual private cloud (VPC) environment. Is a Infrastructure as Code (IaC) deployment built with Terraform. Lives in a dedicated AWS or Azure account, and can be customized with certain configurations, such as firewall rules, to limit inbound traffic, or hosting in a specific regions.
 
 ## Regions & IP addresses
 
