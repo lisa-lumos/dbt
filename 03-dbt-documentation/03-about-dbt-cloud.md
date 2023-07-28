@@ -29,54 +29,18 @@ The Multi Tenant (SaaS) deployment environment refers to the SaaS dbt Cloud appl
 Single tenant dbt Cloud instances provide dedicated infrastructure, in a virtual private cloud (VPC) environment. Is a Infrastructure as Code (IaC) deployment built with Terraform. Lives in a dedicated AWS or Azure account, and can be customized with certain configurations, such as firewall rules, to limit inbound traffic, or hosting in a specific regions.
 
 ## Regions & IP addresses
+dbt Cloud is hosted in multiple regions, and will always connect to your data platform, or git provider, from a few IP addresses. 
 
+Be sure to allow traffic from these IPs in your firewall, and include them in any database grants.
 
+dbt Cloud Enterprise plans can choose to have their account hosted certain regions. Organizations must choose a single region, per dbt Cloud account. 
+
+If you need to run dbt Cloud in multiple regions, then use multiple dbt Cloud accounts.
 
 ## About dbt Cloud IDE
+A single interface for building, testing, running, and version-controlling dbt projects from your browser. 
 
-
+The IDE leverages the open-source dbt-rpc plugin, to recompile only the changes made in your project.
 
 ## Supported browsers
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+skipped. 
