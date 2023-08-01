@@ -35,8 +35,18 @@ To use the dbt Cloud IDE, each developer need to set up personal development cre
 Deployment environments in dbt Cloud are necessary to execute scheduled jobs. 
 
 ### Connect data platform
+The following fields are required when creating a Snowflake connection:
+- account
+- role
+- database
+- warehouse
 
+Ensure that users (in dev envs), and service accounts (in prod envs) have the correct permissions to take actions on Snowflake. 
 
+Authentication methods:
+- Username/password. Available in dev/prod env
+- key pair auth. Available in dev/prod env
+- Snowflake OAuth. Available in dev only. Need SF enterprise edition. 
 
 ### Manage access
 
