@@ -56,9 +56,11 @@ dbt Cloud admins can use dbt Cloud's permissioning model to control user-level a
 Each user is assigned a license type, when they are first invited to the account. This license type may change over time, but a user can only have one license type at any given time.
 
 dbt Cloud's 3 license types:
-- Developer. User may be granted any permissions.
+- Developer. For dev/prod features. User may be granted any permissions.
 - Read-Only. User has read-only permissions to all dbt Cloud resources, which overrides user's role in RBAC.
-- IT. User has Security/Billing Admin permissions, which overrides user's role in RBAC.
+- IT. For managing permissions. User has Security/Billing Admin permissions, which overrides user's role in RBAC.
+
+Each dbt Cloud plan comes with a base number of Developer, IT, and Read-Only licenses. You can add/remove licenses, by modifying the num of users in your account settings. By default, new users will be assigned a Developer license.
 
 RBAC is a feature of the dbt Cloud Enterprise plan. Allows for fine-grained permissioning in the dbt Cloud. Users can have diff permissions to diff projects. Role-based permissions can be generated dynamically, from configurations in an Identity Provider. So dbt Cloud admins can manage access to dbt Cloud via identity management software, like Azure AD, Okta, or GSuite. 
 
