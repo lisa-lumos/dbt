@@ -81,11 +81,13 @@ Group memberships are updated, whenever a user logs into dbt Cloud via SSO. If y
 
 To edit the group membership of yourself, you'll need a different user to do this.
 
+dbt Cloud supports two permission sets, to manage permissions for self-service accounts: Member and Owner.
 
+The dbt Cloud Enterprise plan supports a number of pre-built R/W account/project level permission sets to help manage access controls. Account roles enable you to manage the dbt Cloud account and manage the account settings. The project roles enable you to work within the projects in various capacities.
 
+SSO/Oauth are available for Enterprise plan only. 
 
-
-
+dbt provides logs of audited user/system events in real time.  
 
 
 
