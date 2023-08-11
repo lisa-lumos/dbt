@@ -87,18 +87,9 @@ The dbt Cloud Enterprise plan supports a number of pre-built R/W account/project
 
 SSO/Oauth are available for Enterprise plan only. 
 
-dbt provides logs of audited user/system events in real time.  
+dbt provides logs of audited user/system events in real time. You must be an Account Admin to access the audit log, and this feature is only available on Enterprise plans.
 
-
-
-
-
-
-
-
-
-
-
+Events within 90 days will be automatically displayed with a selectable date range. Older event can be exported directly. 
 
 ### Configure Git
 
