@@ -92,10 +92,46 @@ dbt provides logs of audited user/system events in real time. You must be an Acc
 Events within 90 days will be automatically displayed with a selectable date range. Older event can be exported directly. 
 
 ### Configure Git
-
-
+dbt Cloud uses the SSH protocol to clone repositories, so dbt Cloud will be unable to clone repos supplied with the HTTP protocol.
 
 ### Develop in the IDE
+To improve your experience using dbt Cloud, turn off ad blockers. Some project file names, such as "google_adwords.sql", might resemble ad traffic, and trigger ad blockers. 
+
+Multiple selections: Option and click on an area, or Ctrl-Alt and click on an area. 
+
+Autocomplete features:
+- `ref` for model names
+- `source` for source/table name
+- `macro` for arguments
+- `env var` for env vars
+- `-` in a YAML file
+
+3 Cloud IDE start-up states:
+- Creation start. Starting the IDE for the first time. Like a cold start, takes longer, because the git repo is being cloned.
+- Cold start. Starting a new develop session. Turns off after if no compile/preview/invocation activity for 3 hrs. 
+- Hot start. Resuming an existing/active develop session, within 3 hours of the last compile/preview/invocation activity.
+
+Saved changes live forever. You can only change branches after you commit your code to the current branch. 
+
+The IDE (aka, dev env) uses individual developer credentials to connect to your data platform. These credentials should be specific to your user. They should not be super user credentials, shouldn't be the same credentials for your dbt prod env.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
