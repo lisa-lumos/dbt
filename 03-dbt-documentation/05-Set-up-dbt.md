@@ -115,23 +115,29 @@ Saved changes live forever. You can only change branches after you commit your c
 
 The IDE (aka, dev env) uses individual developer credentials to connect to your data platform. These credentials should be specific to your user. They should not be super user credentials, shouldn't be the same credentials for your dbt prod env.
 
+#### UI
+dbt Editor Command Palette: Displays text editing actions, and their associated keyboard shortcuts. Can be accessed by:
+- press F1, or,
+- right-click in the text editing area, and select Command Palette.
+
+CSV Preview console tab: Displays the data from your CSV file in a table, syncs as you edit the seed file.
+
+Preview button: Runs the SQL in the active file editor, including unsaved edits, and sends the results to the "Results" tab.
+
+Compile button: compiles the SQL code from the active File Editor, including unsaved edits, and outputs it to the "Compiled Code" tab.
+
+Editor tab menu: Right-click any tab to access the options, such as close all/other files, copy file name, ...
+
+Global Command Palette: Provides shortcuts to interact with the IDE, such as git actions, specialized dbt commands, compile, and preview actions, etc. To open the menu, use Command-P or Control-P.
+
+#### Lint and format
 
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+#### Tips and tricks
 
 
 
