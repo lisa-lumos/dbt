@@ -131,17 +131,40 @@ Editor tab menu: Right-click any tab to access the options, such as close all/ot
 Global Command Palette: Provides shortcuts to interact with the IDE, such as git actions, specialized dbt commands, compile, and preview actions, etc. To open the menu, use Command-P or Control-P.
 
 #### Lint and format
-
-
-
-
-
+skipped. 
 
 #### Tips and tricks
+Select/edit multiple lines: Hold Option on macOS, or Hold Alt on Windows.
 
+Reveal a list of dbt functions: Enter __ in the editor.
 
+Add a block comment: `Command + Option + /` on macOS, or `Control + Alt + /` on Windows, on the selected code. 
+
+Use the `dbt_codegen` package, to help you generate YML files for your models/sources.
+
+Use your folder structure as your primary selector method. `dbt build --select marts.marketing` is simpler/resilient than relying on tagging.
+
+Think about jobs in terms of build cadences/dependencies and SLAs. Run models that have hourly, daily, or weekly build cadences/dependencies together.
+
+Use incremental_strategy in your incremental model config, to implement the most effective behavior, depending on the volume of your data, and reliability of your unique keys.
+
+Set `vars` in your "dbt_project.yml" to define global defaults for certain conditions, which you can then override using the `--vars` flag in your commands.
+
+Instead of relying on post-hooks, use the grants config to apply permission grants in the warehouse resiliently.
+
+Use target.name based on what env you're using. For example, to build into a single dev schema while developing, but use multiple schemas in production.
 
 ### Secure your tenant
+The setup of a Snowflake AWS PrivateLink endpoint, in the dbt Cloud multi-tenant environment.
+
+Organizations can configure IP restrictions, with these dbt Cloud Enterprise tiers:
+- Business Critical
+- Virtual Private
+
+### Billing
+
+
+
 
 
 
