@@ -162,13 +162,9 @@ Organizations can configure IP restrictions, with these dbt Cloud Enterprise tie
 - Virtual Private
 
 ### Billing
+You pay for the num of seats (Developer/Read-Only/IT) you have, and the amount of usage (num of successful models built/run in prod) each month. Seats are billed primarily on the purchased num of Developer licenses. 
 
-
-
-
-
-
-
+Every plan automatically sends email alerts when 75%, 90%, and 100% of usage estimates have been reached. 
 
 ## dbt Core
 
