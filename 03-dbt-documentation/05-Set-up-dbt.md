@@ -167,6 +167,30 @@ You pay for the num of seats (Developer/Read-Only/IT) you have, and the amount o
 Every plan automatically sends email alerts when 75%, 90%, and 100% of usage estimates have been reached. 
 
 ## dbt Core
+dbt Core is an open-source tool, which enables data teams to transform data using analytics engineering best practices. You can install dbt locally in your environment, and use it on the command line. It communicates with databases through adapters.
+
+### About the CLI
+To use the CLI, your workflow looks like:
+- Build your dbt project in a code editor
+- Run your project from the command line
+
+### dbt Core environments
+dbt maintain prod and dev envs, through the use of targets within a profile.
+
+A typical profile, when using dbt locally, will have a target named dev as the default. Once you are confident in your changes in dev, you can deploy the code to prod, by running your dbt project with a prod target.
+
+Targets offer the flexibility to decide how to implement your separate envs - whether you want to use separate schemas/databases/clusters. 
+
+We recommend using different schemas within one db, to separate your envs. This is the easiest to set up, and is the most cost-effective solution, in a modern cloud-based data stack. In practice, this means that most of the configs will be same across targets, except for the schema, and user credentials.
+
+If you have multiple developers, recommend for each user to have their own dev env, with target schema named by user name, such as "dbt_lisa". User credentials should also differ across targets, so that each dbt user is using their own data warehouse user.
+
+### Install dbt
+
+
+
+
+### Connect data platform
 
 
 
