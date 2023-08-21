@@ -185,30 +185,67 @@ We recommend using different schemas within one db, to separate your envs. This 
 
 If you have multiple developers, recommend for each user to have their own dev env, with target schema named by user name, such as "dbt_lisa". User credentials should also differ across targets, so that each dbt user is using their own data warehouse user.
 
-### Install dbt
+### Install dbt Core
+Recommend to use pip to install dbt: `pip install dbt-<adapterName>`. 
 
-
-
+To upgrade a specific adapter plugin: `pip install --upgrade dbt-<adapterName>`
 
 ### Connect data platform
+To use dbt from the CLI, you need a "profiles.yml" file, which contains the connection details for your data platform. 
 
+When you run dbt from the CLI, it reads your "dbt_project.yml" file in your project folder, to find the profile name, and then looks for a profile with the same name in your "profiles.yml" file. 
 
+#### About "profiles.yml" file
+If you're using dbt Cloud, you connect to your data platform directly, using GUI, and don't need the "profiles.yml" file.
+
+You can set default values of global configs, for all projects that you run on your local machine. 
+
+#### Connection profiles in "profiles.yml"
+dbt will search the current working directory for the "profiles.yml" file, and will default to the` ~/.dbt/` directory if not found.
+
+This file generally lives outside of your dbt project, to avoid sensitive credentials being checked in to version control. But it can be safely checked in using environment variables to load sensitive credentials.
+
+In "profiles.yml" file, you can store as many profiles as you need. Typically, you would have one profile for each warehouse you use. Most organizations only have one profile.
+
+A profile consists of "targets", and a specified "default target". Each target specifies the type of warehouse you are connecting to, the credentials to connect to it, and some dbt-specific configs. You may need to surround your password in quotes, if it contains special characters.
+- Profile name: Recommend to use the name of your organization.
+- `target`: The default target for your dbt project. Must be one of the targets you define in your profile. Commonly it is set to `dev`.
+- schema: The default schema that dbt will build objects in.
+- threads: The num of threads the dbt project will run on.
+
+Run `dbt debug` from within a dbt project, to test your connection.
+
+You may also have a `prod` target within your profile, which creates the objects in your prod schema. However, production runs are often executed on a schedule, we recommend deploying your dbt project to a separate machine, other than your local machine. Most dbt users only have a `dev` target in their profile on their local machine, with schema named "dbt_userName".
+
+If you do have multiple targets in your profile, and want to use a target other than the default, you can do this using the `--target` option when issuing a dbt command.
+
+The schema used for production: recommend name: `analytics`.
+
+There's no need to create your target schema beforehand - dbt will check if the schema already exists when it runs, and create it if it doesn't.
+
+While the target schema represents the dbt default schema, you can have your models in separate schemas, by using "custom schemas".
+
+The number of threads represents the max num of paths through the DAG dbt may work on at once. Increasing the num of threads can minimize the run time of your project. The default value is 4 threads.
+
+The location dir for "profiles.yml" has the following precedence:
+- `--profiles-dir` option in dbt run
+- `DBT_PROFILES_DIR` environment variable
+- current working dir
+- `~/.dbt/` dir
+
+Credentials can be placed directly into the profiles.yml file, or loaded from environment variables. Using environment variables is especially useful for prod deployments of dbt.
 
 ## Run your dbt projects
 
 
 
+
+
+
+
+
+
 ## Use threads
-
-
-
-
-
-
-
-
-
-
 
 
 
