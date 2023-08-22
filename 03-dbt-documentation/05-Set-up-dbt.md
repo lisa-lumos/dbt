@@ -236,33 +236,15 @@ The location dir for "profiles.yml" has the following precedence:
 Credentials can be placed directly into the profiles.yml file, or loaded from environment variables. Using environment variables is especially useful for prod deployments of dbt.
 
 ## Run your dbt projects
-
-
-
-
-
-
-
-
+Nothing new here. Skipped. 
 
 ## Use threads
+If you specify "threads: 1", dbt will start building only one model, and finish it, before moving onto the next. Specifying "threads: 8" means that dbt will work on up to 8 models at once, without violating dependencies - the actual number of models it can work on will likely be constrained by the available paths through the dependency graph.
 
+Increasing the number of threads increases the load on your warehouse, which may impact other tools in your data stack, that uses the same compute resources as dbt. 
 
+The number of concurrent queries your data platform will allow you to run, may be a limiting factor in how many models can be actively built - some models may queue, while waiting for an available query slot.
 
+We recommend setting this to 4, to start with. Recommend to test different values to find the best num of threads for your project.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+In dbt Core, you define the number of threads in your "profiles.yml" file; in dbt Cloud, you can define it in job definition, and dbt Cloud development credentials under your profile.
