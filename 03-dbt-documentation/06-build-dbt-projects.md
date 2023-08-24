@@ -31,13 +31,106 @@ If you want to see what a mature, production project looks like, check out the "
 
 ## Build your DAG
 ### Sources
+Sources make it possible to name/describe the source data. By declaring them as sources in dbt, you can then:
+- refer to them in your models: `{{ source('source_schema_name', 'source_table_name') }}`
+- run tests on them
+- check their freshness
 
+Sources are defined in ".yml" files, under a `sources:` key:
+```yml
+version: 2
 
+sources:
+  - name: jaffle_shop
+    database: raw  
+    schema: jaffle_shop  
+    tables:
+      - name: orders
+      - name: customers
 
+  - name: stripe
+    tables:
+      - name: payments
+```
 
+Note that, 
+- By default, `schema` will be the same as source `name`. Add `schema` only if you want to use a source name, that differs from the existing schema name. 
+- Use `database: ` if the source is in a diff db than dbt target db. 
+- For snowflake, if you need to quote obj name, use the `quoting` property.
 
+To have tests on sources:
+```yml
+version: 2
 
+sources:
+  - name: jaffle_shop
+    description: This is a replica of the Postgres database used by our app
+    tables:
+      - name: orders
+        description: >
+          One record per order. Includes cancelled and deleted orders.
+        columns:
+          - name: id
+            description: Primary key of the orders table
+            tests:
+              - unique
+              - not_null
+          - name: status
+            description: Note that the status can change over time
 
+      - name: ...
+
+  - name: ...
+```
+
+To run tests on sources:
+```console
+# test all sources: 
+$ dbt test --select source:*
+
+# test only one source (schema) name: 
+$ dbt test --select source:jaffle_shop
+
+# test one source table name:
+$ dbt test --select source:jaffle_shop.orders
+```
+
+To run models downstream of a source:
+```console
+# run models downstream of a source (schema) name:
+$ dbt run --select source:jaffle_shop+
+
+# run models downstream of a source table name: 
+$ dbt run --select source:jaffle_shop.orders+
+```
+
+Source freshness checks are useful for understanding if your data pipelines are healthy, and is a critical component of defining SLAs for your warehouse.
+
+To check source freshness:
+```yml
+version: 2
+
+sources:
+  - name: jaffle_shop
+    database: raw
+    freshness: # default freshness
+      warn_after: {count: 12, period: hour}
+      error_after: {count: 24, period: hour}
+    loaded_at_field: _etl_loaded_at # required to check freshness
+
+    tables:
+      - name: orders
+        freshness: # make this a little more strict
+          warn_after: {count: 6, period: hour}
+          error_after: {count: 12, period: hour}
+
+      - name: customers # uses the freshness defined for the schema
+
+      - name: product_skus
+        freshness: null # do not check freshness for this table
+```
+
+The command `dbt source freshness` checks freshness of sources. 
 
 ### Models
 
