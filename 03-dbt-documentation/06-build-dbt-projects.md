@@ -133,8 +133,11 @@ sources:
 The command `dbt source freshness` checks freshness of sources. 
 
 ### Models
+Models are primarily written as a "select" statement and saved as a ".sql" file. 
 
+Starting in version 1.3, dbt Core/Cloud support Python models. They are useful for training/deploying data science models, complex transformations, or where a specific Python package meets a need - such as using the `dateutil` library to parse dates.
 
+Your organization may need only a few models, but more likely you'll need a complex structure of nested models to transform the required data. 
 
 ### Seeds
 
