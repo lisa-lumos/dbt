@@ -139,6 +139,41 @@ Starting in version 1.3, dbt Core/Cloud support Python models. They are useful f
 
 Your organization may need only a few models, but more likely you'll need a complex structure of nested models to transform the required data. 
 
+#### SQL Models
+The model name is inherited from the file name. Models can be nested in subdirs within the "models" directory. 
+
+When you execute "dbt run ...", dbt will build this model, by wrapping it in a "create view as" or "create table as" statement.
+
+Your should write the models using the SQL flavor of your own data platform. 
+
+Model configs can be set in your "dbt_project.yml" file, and in that model file using a "{{ config(...) }}" block.
+
+Configurations include:
+- Change the model's materialization
+- Build models into separate schemas.
+- Apply tags to a model.
+- aliases
+- hooks
+- ...
+
+Configs are applied hierarchically - a more specific one will override any less specific ones.
+
+You can build dependencies between models by using the "{{ ref('...') }}" in place of table names in a query. 
+
+dbt uses the ref function to:
+- Determine the order to run the models, by creating a dependent acyclic graph (DAG).
+- Manage separate envs. dbt will prefix the referred model name with the db & schema name. Importantly, this is environment-aware, because dev and prod use diff schemas. 
+
+The ref function encourages you to write modular transformations, so that you can re-use models, and reduce repeated code.
+
+If you wish to use insert statements for performance reasons, consider incremental models. 
+
+If you wish to use insert statements since your source data is constantly changing (e.g. to create "Type 2 Slowly Changing Dimensions"), you can snapshot your source data, and building models on top of your snapshots.
+
+#### Python Models
+
+
+
 ### Seeds
 
 
