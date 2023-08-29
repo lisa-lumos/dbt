@@ -171,8 +171,50 @@ If you wish to use insert statements for performance reasons, consider increment
 If you wish to use insert statements since your source data is constantly changing (e.g. to create "Type 2 Slowly Changing Dimensions"), you can snapshot your source data, and building models on top of your snapshots.
 
 #### Python Models
+Snowflake uses its own framework, Snowpark, which has many similarities to PySpark.
 
+dbt Python models can help you solve use cases that can't be solved with SQL.
 
+In a dbt Python model, all Python code is executed remotely on the platform. None of it is run by dbt locally. 
+
+A dbt Python model is a function that reads in dbt sources/models, applies transformations, and returns a transformed dataset. DataFrame operations define the starting points, the end state, and each step along the way. Each Python model returns a final DataFrame.
+
+Each DataFrame operation is "lazily evaluated." In dev, you can preview its data, using methods like .show() or .head(). When you run a Python model, the full result of the final DataFrame will be saved as a table in your data warehouse.
+
+dbt Python models have access to almost all of the same config options as SQL models.
+
+Each Python model lives in a ".py" file in your "models/" folder. It defines a function named model(), which takes two parameters:
+- dbt: A class compiled by dbt Core, unique to each model, enables you to run your Python code in the context of your dbt project and DAG.
+session: A class representing your data platform's connection to the Python backend. The session is needed to read in tables as DataFrames, and to write DataFrames back to tables. 
+
+The model() function must return a single DataFrame. On Snowpark (Snowflake), this can be a Snowpark or pandas DataFrame.
+
+This is how every single Python model should look:
+```py
+def model(dbt, session):
+    ...
+    return final_df
+```
+
+Use the `dbt.ref()` within a Python model, to read data from other SQL/Python models. Use `dbt.source()` to read a source table. 
+
+Note that, referencing ephemeral models is currently not supported. 
+
+Just like SQL models, there are three ways to config Python models. 
+
+Python models support 2 materializations:
+- table (default)
+- incremental
+
+In addition to defining a model function, the Python model can import other functions, or define its own. 
+
+You can use the `@udf` decorator or `udf` function to define an "anonymous" function and call it within your model function's DataFrame transformation. 
+
+Limitations of Python models:
+- Time and cost. Python models are slower to run than SQL models, and the cloud resources that run them can be more expensive.
+- Syntax differences are even more pronounced. If there are 5 ways to do something in SQL, there are 500 ways to write it in Python, all with varying performance and adherence to standards.
+- These capabilities are very new. 
+- Lack of `print()` support. 
 
 ### Seeds
 
