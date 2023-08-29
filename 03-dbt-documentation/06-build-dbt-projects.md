@@ -217,8 +217,27 @@ Limitations of Python models:
 - Lack of `print()` support. 
 
 ### Seeds
+Seeds are CSV files in your dbt project (typically in your "seeds" dir), that dbt can load into your data warehouse, using the `dbt seed` command (behind the scene, it is a truncate and load, if the table already exists).
 
+Seeds can be referenced in downstream models, the same way as models.
 
+Because these CSV files are located in your dbt repository, they are version controlled and code reviewable. Seeds are best suited to static data which changes infrequently.
+
+Good use-cases for seeds: mappings of country codes to country names, test emails list to exclude from analysis, employee account ID list. 
+
+Poor use-cases of dbt seeds: Raw data that has been exported to CSVs; production data containing sensitive information.
+
+You can document/test seeds in YAML, by declaring properties. 
+
+If you changed the columns of your seed, you may get a Database Error. In this case, you can run `dbt seed --full-refresh`. 
+
+dbt will infer the datatype for each column based on the data in your CSV. You can also explicitly set a datatype using the `column_types` config in the yml file. Works when you need to preserve leading zeros (in a zipcode, or mobile number). 
+
+You can run models downstream of a seed, using the same model selection syntax, treating the seed like a model.
+
+You can use `--select` in the `dbt seed` command, to run a specific seed. 
+
+Hooks work with seeds too. 
 
 ### Snapshots
 
