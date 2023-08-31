@@ -21,6 +21,7 @@ Verified adapters:
 - Starburst/Trino
 - Fabric Synapse
 - Azure Synapse
+- Teradata
 
 ## How to connect to adapters
 Using 

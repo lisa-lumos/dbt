@@ -30,6 +30,195 @@ In dbt Cloud, you can use the "Project subdirectory" option, to specify a subdir
 If you want to see what a mature, production project looks like, check out the "GitLab Data Team public repo": https://gitlab.com/gitlab-data/analytics/-/tree/master/transform/snowflake-dbt.
 
 ## Build your DAG
+### Models
+Models are primarily written as a "select" statement and saved as a ".sql" file. 
+
+Starting in version 1.3, dbt Core/Cloud support Python models. They are useful for training/deploying data science models, complex transformations, or where a specific Python package meets a need - such as using the `dateutil` library to parse dates.
+
+Your organization may need only a few models, but more likely you'll need a complex structure of nested models to transform the required data. 
+
+#### SQL Models
+The model name is inherited from the file name. Models can be nested in subdirs within the "models" directory. 
+
+When you execute "dbt run ...", dbt will build this model, by wrapping it in a "create view as" or "create table as" statement.
+
+Your should write the models using the SQL flavor of your own data platform. 
+
+Model configs can be set in your "dbt_project.yml" file, and in that model file using a "{{ config(...) }}" block.
+
+Configurations include:
+- Change the model's materialization
+- Build models into separate schemas.
+- Apply tags to a model.
+- aliases
+- hooks
+- ...
+
+Configs are applied hierarchically - a more specific one will override any less specific ones.
+
+You can build dependencies between models by using the "{{ ref('...') }}" in place of table names in a query. 
+
+dbt uses the ref function to:
+- Determine the order to run the models, by creating a dependent acyclic graph (DAG).
+- Manage separate envs. dbt will prefix the referred model name with the db & schema name. Importantly, this is environment-aware, because dev and prod use diff schemas. 
+
+The ref function encourages you to write modular transformations, so that you can re-use models, and reduce repeated code.
+
+If you wish to use insert statements for performance reasons, consider incremental models. 
+
+If you wish to use insert statements since your source data is constantly changing (e.g. to create "Type 2 Slowly Changing Dimensions"), you can snapshot your source data, and building models on top of your snapshots.
+
+#### Python Models
+Snowflake uses its own framework, Snowpark, which has many similarities to PySpark.
+
+dbt Python models can help you solve use cases that can't be solved with SQL.
+
+In a dbt Python model, all Python code is executed remotely on the platform. None of it is run by dbt locally. 
+
+A dbt Python model is a function that reads in dbt sources/models, applies transformations, and returns a transformed dataset. DataFrame operations define the starting points, the end state, and each step along the way. Each Python model returns a final DataFrame.
+
+Each DataFrame operation is "lazily evaluated." In dev, you can preview its data, using methods like .show() or .head(). When you run a Python model, the full result of the final DataFrame will be saved as a table in your data warehouse.
+
+dbt Python models have access to almost all of the same config options as SQL models.
+
+Each Python model lives in a ".py" file in your "models/" folder. It defines a function named model(), which takes two parameters:
+- dbt: A class compiled by dbt Core, unique to each model, enables you to run your Python code in the context of your dbt project and DAG.
+session: A class representing your data platform's connection to the Python backend. The session is needed to read in tables as DataFrames, and to write DataFrames back to tables. 
+
+The model() function must return a single DataFrame. On Snowpark (Snowflake), this can be a Snowpark or pandas DataFrame.
+
+This is how every single Python model should look:
+```py
+def model(dbt, session):
+    ...
+    return final_df
+```
+
+Use the `dbt.ref()` within a Python model, to read data from other SQL/Python models. Use `dbt.source()` to read a source table. 
+
+Note that, referencing ephemeral models is currently not supported. 
+
+Just like SQL models, there are three ways to config Python models. 
+
+Python models support 2 materializations:
+- table (default)
+- incremental
+
+In addition to defining a model function, the Python model can import other functions, or define its own. 
+
+You can use the `@udf` decorator or `udf` function to define an "anonymous" function and call it within your model function's DataFrame transformation. 
+
+Limitations of Python models:
+- Time and cost. Python models are slower to run than SQL models, and the cloud resources that run them can be more expensive.
+- Syntax differences are even more pronounced. If there are 5 ways to do something in SQL, there are 500 ways to write it in Python, all with varying performance and adherence to standards.
+- These capabilities are very new. 
+- Lack of `print()` support. 
+
+### Snapshots
+Records changes to a mutable table over time (SCD-2).
+
+In dbt, snapshots are select statements, defined within a "snapshot block" in a sql file, typically in your "snapshots" folder. 
+
+Such as "snapshots/orders_snapshot.sql":
+```sql
+{% snapshot orders_snapshot %}
+
+{{
+    config(
+      target_database='analytics',
+      target_schema='snapshots',
+      unique_key='id',
+
+      strategy='timestamp',
+      updated_at='updated_at',
+    )
+}}
+
+select * from {{ source('jaffle_shop', 'orders') }}
+
+{% endsnapshot %}
+```
+
+When you run the dbt snapshot command:
+- On the first run: dbt will create the initial snapshot table, which is the result set of your select statement, with additional columns, such as: `dbt_valid_from`/`dbt_valid_to`. All records will have a `dbt_valid_to` = `null`.
+- On subsequent runs: dbt will check which records have changed, or if any new records have been created. The `dbt_valid_to` will be updated for any existing records that have changed. The updated record and any new records will be inserted into the snapshot table. These records will now have `dbt_valid_to` = `null`
+
+Snapshots can be referenced in downstream models with `ref(...)`.
+
+There are two snapshot strategies built-in to dbt:
+1. Timestamp strategy (recommended). uses an `updated_at` field to determine if a row has changed. 
+   - If the `updated_at` for a row is more recent than the last time the snapshot ran (how does dbt know when it was last run? Based on the `dbt_updated_at` val for this row), then dbt will:
+     - Invalidate the old record, setting its `dbt_valid_to` to the `updated_at` val.
+     - Record the new one, setting its `dbt_valid_from` to the `updated_at` val. 
+   - If the timestamps are unchanged, then dbt will do nothing.
+2. Check strategy. Useful for tables without a reliable `updated_at` column. Works by comparing current and historical values for a list of cols. If any of these cols changed, dbt will invalidate the old record, and record the new one. If the column values are identical, then dbt will do nothing.
+
+Rows that are deleted from the source are not invalidated (sealed up) by default. With the config option `invalidate_hard_deletes`, dbt can track rows that no longer exist, and set `dbt_valid_to` to the current snapshot time.
+
+Snapshot-specific configs:
+- target_database. Optional
+- target_schema. Required
+- strategy. Required
+- unique_key. Required
+- check_cols. Required if using check strategy
+- updated_at. Required if using timestamp strategy
+- invalidate_hard_deletes. Optional
+
+It's extremely important, to make sure this unique key is actually unique. 
+
+Recommend to use a `target_schema` that is separate to your analytics schema. Snapshots CANNOT be rebuilt. As such, it's a good idea to put snapshots in a separate schema, so end users know they are special. 
+
+Snapshot best practices: 
+- Snapshot source data. As much as possible, snapshot your source data in its raw form, and use downstream models to clean up the data. Your models should select from these snapshots, treating them like data sources. 
+- Use the `source(...)` in your query. Helps with the lineage. 
+- Include as many columns as possible. Go for `select *` if performance permits.  
+- Avoid joins in your snapshot directly. It makes it difficult to build a reliable `updated_at` timestamp. Instead, snapshot the two tables separately, and join them in downstream models.
+- Limit the amount of transformation in it. To be future-proof. 
+
+The dbt snapshot command must be run on a schedule, to ensure that changes to tables are actually recorded. While individual use-cases may vary, snapshots are intended to be run `between hourly and daily`. If you find yourself snapshotting more frequently than that, consider to capture changes in your source data tables.
+
+You can select with snapshot to run, with `--select`. 
+
+When the columns of your source query changes, dbt will attempt to reflect this change in the destination snapshot table:
+- Create new columns in destination table, if new cols added in the source
+- Expand the size of string types where necessary (eg. varchars on Redshift)
+
+dbt will NOT delete columns in the destination snapshot table, if they are removed from the source. It will NOT change the datatype of a column, beyond expanding the size of varchar columns. If a string column is changed to a date column in the source, dbt will not change the datatype of the column in the destination table.
+
+Snapshots build into the same `target_schema`, no matter who is running them, and is "not environment-aware" by default. In comparison, models build into a separate schema for each user - this helps maintain separate dev/prod envs.
+
+### Seeds
+Seeds are CSV files in your dbt project (typically in your "seeds" dir), that dbt can load into your data warehouse, using the `dbt seed` command (behind the scene, it is a truncate and load, if the table already exists).
+
+Seeds can be referenced in downstream models, the same way as models.
+
+Because these CSV files are located in your dbt repository, they are version controlled and code reviewable. Seeds are best suited to static data which changes infrequently.
+
+Good use-cases for seeds: mappings of country codes to country names, test emails list to exclude from analysis, employee account ID list. 
+
+Poor use-cases of dbt seeds: Raw data that has been exported to CSVs; production data containing sensitive information.
+
+You can document/test seeds in YAML, by declaring properties. 
+
+If you changed the columns of your seed, you may get a Database Error. In this case, you can run `dbt seed --full-refresh`. 
+
+dbt will infer the datatype for each column based on the data in your CSV. You can also explicitly set a datatype using the `column_types` config in the yml file. Works when you need to preserve leading zeros (in a zipcode, or mobile number). 
+
+You can run models downstream of a seed, using the same model selection syntax, treating the seed like a model.
+
+You can use `--select` in the `dbt seed` command, to run a specific seed. 
+
+Hooks work with seeds too. 
+
+### Tests
+
+
+
+
+### Jinja and macros
+
+
+
 ### Sources
 Sources make it possible to name/describe the source data. By declaring them as sources in dbt, you can then:
 - refer to them in your models: `{{ source('source_schema_name', 'source_table_name') }}`
@@ -132,186 +321,6 @@ sources:
 
 The command `dbt source freshness` checks freshness of sources. 
 
-### Models
-Models are primarily written as a "select" statement and saved as a ".sql" file. 
-
-Starting in version 1.3, dbt Core/Cloud support Python models. They are useful for training/deploying data science models, complex transformations, or where a specific Python package meets a need - such as using the `dateutil` library to parse dates.
-
-Your organization may need only a few models, but more likely you'll need a complex structure of nested models to transform the required data. 
-
-#### SQL Models
-The model name is inherited from the file name. Models can be nested in subdirs within the "models" directory. 
-
-When you execute "dbt run ...", dbt will build this model, by wrapping it in a "create view as" or "create table as" statement.
-
-Your should write the models using the SQL flavor of your own data platform. 
-
-Model configs can be set in your "dbt_project.yml" file, and in that model file using a "{{ config(...) }}" block.
-
-Configurations include:
-- Change the model's materialization
-- Build models into separate schemas.
-- Apply tags to a model.
-- aliases
-- hooks
-- ...
-
-Configs are applied hierarchically - a more specific one will override any less specific ones.
-
-You can build dependencies between models by using the "{{ ref('...') }}" in place of table names in a query. 
-
-dbt uses the ref function to:
-- Determine the order to run the models, by creating a dependent acyclic graph (DAG).
-- Manage separate envs. dbt will prefix the referred model name with the db & schema name. Importantly, this is environment-aware, because dev and prod use diff schemas. 
-
-The ref function encourages you to write modular transformations, so that you can re-use models, and reduce repeated code.
-
-If you wish to use insert statements for performance reasons, consider incremental models. 
-
-If you wish to use insert statements since your source data is constantly changing (e.g. to create "Type 2 Slowly Changing Dimensions"), you can snapshot your source data, and building models on top of your snapshots.
-
-#### Python Models
-Snowflake uses its own framework, Snowpark, which has many similarities to PySpark.
-
-dbt Python models can help you solve use cases that can't be solved with SQL.
-
-In a dbt Python model, all Python code is executed remotely on the platform. None of it is run by dbt locally. 
-
-A dbt Python model is a function that reads in dbt sources/models, applies transformations, and returns a transformed dataset. DataFrame operations define the starting points, the end state, and each step along the way. Each Python model returns a final DataFrame.
-
-Each DataFrame operation is "lazily evaluated." In dev, you can preview its data, using methods like .show() or .head(). When you run a Python model, the full result of the final DataFrame will be saved as a table in your data warehouse.
-
-dbt Python models have access to almost all of the same config options as SQL models.
-
-Each Python model lives in a ".py" file in your "models/" folder. It defines a function named model(), which takes two parameters:
-- dbt: A class compiled by dbt Core, unique to each model, enables you to run your Python code in the context of your dbt project and DAG.
-session: A class representing your data platform's connection to the Python backend. The session is needed to read in tables as DataFrames, and to write DataFrames back to tables. 
-
-The model() function must return a single DataFrame. On Snowpark (Snowflake), this can be a Snowpark or pandas DataFrame.
-
-This is how every single Python model should look:
-```py
-def model(dbt, session):
-    ...
-    return final_df
-```
-
-Use the `dbt.ref()` within a Python model, to read data from other SQL/Python models. Use `dbt.source()` to read a source table. 
-
-Note that, referencing ephemeral models is currently not supported. 
-
-Just like SQL models, there are three ways to config Python models. 
-
-Python models support 2 materializations:
-- table (default)
-- incremental
-
-In addition to defining a model function, the Python model can import other functions, or define its own. 
-
-You can use the `@udf` decorator or `udf` function to define an "anonymous" function and call it within your model function's DataFrame transformation. 
-
-Limitations of Python models:
-- Time and cost. Python models are slower to run than SQL models, and the cloud resources that run them can be more expensive.
-- Syntax differences are even more pronounced. If there are 5 ways to do something in SQL, there are 500 ways to write it in Python, all with varying performance and adherence to standards.
-- These capabilities are very new. 
-- Lack of `print()` support. 
-
-### Seeds
-Seeds are CSV files in your dbt project (typically in your "seeds" dir), that dbt can load into your data warehouse, using the `dbt seed` command (behind the scene, it is a truncate and load, if the table already exists).
-
-Seeds can be referenced in downstream models, the same way as models.
-
-Because these CSV files are located in your dbt repository, they are version controlled and code reviewable. Seeds are best suited to static data which changes infrequently.
-
-Good use-cases for seeds: mappings of country codes to country names, test emails list to exclude from analysis, employee account ID list. 
-
-Poor use-cases of dbt seeds: Raw data that has been exported to CSVs; production data containing sensitive information.
-
-You can document/test seeds in YAML, by declaring properties. 
-
-If you changed the columns of your seed, you may get a Database Error. In this case, you can run `dbt seed --full-refresh`. 
-
-dbt will infer the datatype for each column based on the data in your CSV. You can also explicitly set a datatype using the `column_types` config in the yml file. Works when you need to preserve leading zeros (in a zipcode, or mobile number). 
-
-You can run models downstream of a seed, using the same model selection syntax, treating the seed like a model.
-
-You can use `--select` in the `dbt seed` command, to run a specific seed. 
-
-Hooks work with seeds too. 
-
-### Snapshots
-Records changes to a mutable table over time (SCD-2).
-
-In dbt, snapshots are select statements, defined within a "snapshot block" in a sql file, typically in your "snapshots" folder. 
-
-Such as "snapshots/orders_snapshot.sql":
-```sql
-{% snapshot orders_snapshot %}
-
-{{
-    config(
-      target_database='analytics',
-      target_schema='snapshots',
-      unique_key='id',
-
-      strategy='timestamp',
-      updated_at='updated_at',
-    )
-}}
-
-select * from {{ source('jaffle_shop', 'orders') }}
-
-{% endsnapshot %}
-```
-
-When you run the dbt snapshot command:
-- On the first run: dbt will create the initial snapshot table, which is the result set of your select statement, with additional columns, such as: `dbt_valid_from`/`dbt_valid_to`. All records will have a `dbt_valid_to` = `null`.
-- On subsequent runs: dbt will check which records have changed, or if any new records have been created. The `dbt_valid_to` will be updated for any existing records that have changed. The updated record and any new records will be inserted into the snapshot table. These records will now have `dbt_valid_to` = `null`
-
-Snapshots can be referenced in downstream models with `ref(...)`.
-
-There are two snapshot strategies built-in to dbt:
-1. Timestamp strategy (recommended). uses an `updated_at` field to determine if a row has changed. 
-   - If the `updated_at` for a row is more recent than the last time the snapshot ran (how does dbt know when it was last run? Based on the `dbt_updated_at` val for this row), then dbt will:
-     - Invalidate the old record, setting its `dbt_valid_to` to the `updated_at` val.
-     - Record the new one, setting its `dbt_valid_from` to the `updated_at` val. 
-   - If the timestamps are unchanged, then dbt will do nothing.
-2. Check strategy. Useful for tables without a reliable `updated_at` column. Works by comparing current and historical values for a list of cols. If any of these cols changed, dbt will invalidate the old record, and record the new one. If the column values are identical, then dbt will do nothing.
-
-Rows that are deleted from the source are not invalidated (sealed up) by default. With the config option `invalidate_hard_deletes`, dbt can track rows that no longer exist, and set `dbt_valid_to` to the current snapshot time.
-
-Snapshot-specific configs:
-- target_database. Optional
-- target_schema. Required
-- strategy. Required
-- unique_key. Required
-- check_cols. Required if using check strategy
-- updated_at. Required if using timestamp strategy
-- invalidate_hard_deletes. Optional
-
-It's extremely important, to make sure this unique key is actually unique. 
-
-Recommend to use a `target_schema` that is separate to your analytics schema. Snapshots CANNOT be rebuilt. As such, it's a good idea to put snapshots in a separate schema, so end users know they are special. 
-
-Snapshot best practices: 
-- Snapshot source data. As much as possible, snapshot your source data in its raw form, and use downstream models to clean up the data. Your models should select from these snapshots, treating them like data sources. 
-- Use the `source(...)` in your query. Helps with the lineage. 
-- Include as many columns as possible. Go for `select *` if performance permits.  
-- Avoid joins in your snapshot directly. It makes it difficult to build a reliable `updated_at` timestamp. Instead, snapshot the two tables separately, and join them in downstream models.
-- Limit the amount of transformation in it. To be future-proof. 
-
-The dbt snapshot command must be run on a schedule, to ensure that changes to tables are actually recorded. While individual use-cases may vary, snapshots are intended to be run `between hourly and daily`. If you find yourself snapshotting more frequently than that, consider to capture changes in your source data tables.
-
-You can select with snapshot to run, with `--select`. 
-
-When the columns of your source query changes, dbt will attempt to reflect this change in the destination snapshot table:
-- Create new columns in destination table, if new cols added in the source
-- Expand the size of string types where necessary (eg. varchars on Redshift)
-
-dbt will NOT delete columns in the destination snapshot table, if they are removed from the source. It will NOT change the datatype of a column, beyond expanding the size of varchar columns. If a string column is changed to a date column in the source, dbt will not change the datatype of the column in the destination table.
-
-Snapshots build into the same `target_schema`, no matter who is running them, and is "not environment-aware" by default. In comparison, models build into a separate schema for each user - this helps maintain separate dev/prod envs.
-
 ### Exposures
 Define/describe downstream uses of your dbt project, such as in a dashboard, application, or data science pipeline.
 
@@ -352,13 +361,42 @@ Once an exposure is defined, you can run commands that reference it:
 The `dbt_metrics` package has been deprecated, and replaced with `MetricFlow`, a new framework for metrics in dbt. The new Semantic Layer is available to Team/Enterprise multi-tenant dbt Cloud plans hosted in North America. You must be on dbt v1.6 &+ to access it. 
 
 
+### Groups
+
+
+### Analyses
+
+## Build your metrics
+
+### Get started with MetricFlow
+
+### About MetricFlow
+#### Joins
+
+#### Validations
+
+#### MetricFlow time spine
+
+#### MetricFlow CLI commands
+
+### Semantic models
+#### Dimensions
+
+#### Entities
+
+#### Measures
+
+### Metrics
+#### Cumulative
+
+#### Derived
+
+#### Ratio
+
+#### Simple
 
 
 ## Enhance your models
-### Add tests to your DAG
-
-
-
 ### Materializations
 
 
@@ -370,10 +408,6 @@ The `dbt_metrics` package has been deprecated, and replaced with `MetricFlow`, a
 
 
 ## Enhance your code
-### Jinja and macros
-
-
-
 ### Project variables
 
 
@@ -383,11 +417,6 @@ The `dbt_metrics` package has been deprecated, and replaced with `MetricFlow`, a
 
 
 ### Packages
-
-
-
-### Analyses
-
 
 
 ### Hooks and operations
