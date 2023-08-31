@@ -240,8 +240,77 @@ You can use `--select` in the `dbt seed` command, to run a specific seed.
 Hooks work with seeds too. 
 
 ### Snapshots
+Records changes to a mutable table over time (SCD-2).
 
+In dbt, snapshots are select statements, defined within a "snapshot block" in a sql file, typically in your "snapshots" folder. 
 
+Such as "snapshots/orders_snapshot.sql":
+```sql
+{% snapshot orders_snapshot %}
+
+{{
+    config(
+      target_database='analytics',
+      target_schema='snapshots',
+      unique_key='id',
+
+      strategy='timestamp',
+      updated_at='updated_at',
+    )
+}}
+
+select * from {{ source('jaffle_shop', 'orders') }}
+
+{% endsnapshot %}
+```
+
+When you run the dbt snapshot command:
+- On the first run: dbt will create the initial snapshot table, which is the result set of your select statement, with additional columns, such as: `dbt_valid_from`/`dbt_valid_to`. All records will have a `dbt_valid_to` = `null`.
+- On subsequent runs: dbt will check which records have changed, or if any new records have been created. The `dbt_valid_to` will be updated for any existing records that have changed. The updated record and any new records will be inserted into the snapshot table. These records will now have `dbt_valid_to` = `null`
+
+Snapshots can be referenced in downstream models with `ref(...)`.
+
+There are two snapshot strategies built-in to dbt:
+1. Timestamp strategy (recommended). uses an `updated_at` field to determine if a row has changed. 
+   - If the `updated_at` for a row is more recent than the last time the snapshot ran (how does dbt know when it was last run? Based on the `dbt_updated_at` val for this row), then dbt will:
+     - Invalidate the old record, setting its `dbt_valid_to` to the `updated_at` val.
+     - Record the new one, setting its `dbt_valid_from` to the `updated_at` val. 
+   - If the timestamps are unchanged, then dbt will do nothing.
+2. Check strategy. Useful for tables without a reliable `updated_at` column. Works by comparing current and historical values for a list of cols. If any of these cols changed, dbt will invalidate the old record, and record the new one. If the column values are identical, then dbt will do nothing.
+
+Rows that are deleted from the source are not invalidated (sealed up) by default. With the config option `invalidate_hard_deletes`, dbt can track rows that no longer exist, and set `dbt_valid_to` to the current snapshot time.
+
+Snapshot-specific configs:
+- target_database. Optional
+- target_schema. Required
+- strategy. Required
+- unique_key. Required
+- check_cols. Required if using check strategy
+- updated_at. Required if using timestamp strategy
+- invalidate_hard_deletes. Optional
+
+It's extremely important, to make sure this unique key is actually unique. 
+
+Recommend to use a `target_schema` that is separate to your analytics schema. Snapshots CANNOT be rebuilt. As such, it's a good idea to put snapshots in a separate schema, so end users know they are special. 
+
+Snapshot best practices: 
+- Snapshot source data. As much as possible, snapshot your source data in its raw form, and use downstream models to clean up the data. Your models should select from these snapshots, treating them like data sources. 
+- Use the `source(...)` in your query. Helps with the lineage. 
+- Include as many columns as possible. Go for `select *` if performance permits.  
+- Avoid joins in your snapshot directly. It makes it difficult to build a reliable `updated_at` timestamp. Instead, snapshot the two tables separately, and join them in downstream models.
+- Limit the amount of transformation in it. To be future-proof. 
+
+The dbt snapshot command must be run on a schedule, to ensure that changes to tables are actually recorded. While individual use-cases may vary, snapshots are intended to be run `between hourly and daily`. If you find yourself snapshotting more frequently than that, consider to capture changes in your source data tables.
+
+You can select with snapshot to run, with `--select`. 
+
+When the columns of your source query changes, dbt will attempt to reflect this change in the destination snapshot table:
+- Create new columns in destination table, if new cols added in the source
+- Expand the size of string types where necessary (eg. varchars on Redshift)
+
+dbt will NOT delete columns in the destination snapshot table, if they are removed from the source. It will NOT change the datatype of a column, beyond expanding the size of varchar columns. If a string column is changed to a date column in the source, dbt will not change the datatype of the column in the destination table.
+
+Snapshots build into the same `target_schema`, no matter who is running them, and is "not environment-aware" by default. In comparison, models build into a separate schema for each user - this helps maintain separate dev/prod envs.
 
 ### Exposures
 
@@ -288,7 +357,7 @@ Hooks work with seeds too.
 
 
 
-Hooks and operations
+### Hooks and operations
 
 
 ## Organize your outputs
