@@ -313,10 +313,43 @@ dbt will NOT delete columns in the destination snapshot table, if they are remov
 Snapshots build into the same `target_schema`, no matter who is running them, and is "not environment-aware" by default. In comparison, models build into a separate schema for each user - this helps maintain separate dev/prod envs.
 
 ### Exposures
+Define/describe downstream uses of your dbt project, such as in a dashboard, application, or data science pipeline.
 
+By defining exposures, you can then:
+- run/test/list resources that feed into your exposure
+- populate a dedicated page in the auto-generated documentation site, with context relevant to data consumers
 
+Exposures are defined in yml files:
+```yml
+version: 2
+
+exposures:
+
+  - name: weekly_jaffle_metrics # required
+    label: Jaffles by the Week
+    type: dashboard # required. Can be dashboard/notebook/analysis/ml/application
+    maturity: high
+    url: https://bi.tool/dashboards/1
+    description: >
+      Did someone say "exponential growth"?
+
+    depends_on: # expected. 
+      - ref('fct_orders')
+      - ref('dim_customers')
+      - source('gsheets', 'goals')
+      - metric('count_orders')
+
+    owner: # required. name or email
+      name: Callum McData
+      email: data@jaffleshop.com
+```
+
+Once an exposure is defined, you can run commands that reference it:
+- `dbt run -s +exposure:weekly_jaffle_report`
+- `dbt test -s +exposure:weekly_jaffle_report`
 
 ### Metrics
+The `dbt_metrics` package has been deprecated, and replaced with `MetricFlow`, a new framework for metrics in dbt. The new Semantic Layer is available to Team/Enterprise multi-tenant dbt Cloud plans hosted in North America. You must be on dbt v1.6 &+ to access it. 
 
 
 
