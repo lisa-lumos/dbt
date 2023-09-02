@@ -211,9 +211,84 @@ You can use `--select` in the `dbt seed` command, to run a specific seed.
 Hooks work with seeds too. 
 
 ### Tests
+Tests are assertions you make about your models/sources/seeds/snapshots. When you run `dbt test`, dbt will tell you if each test passes/fails.
 
+Tests are SQL select statements that seek to grab "failing" records. If the test returns 0 failing rows, it passes, and your assertion has been validated.
 
+#### Generic test
+Out of the box, you can test `unique`, `not_null`, `accepted_values` and `relationships` (referential integrity). You use them in yml files. Such as:
+```yml
+version: 2
 
+models:
+  - name: orders
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+      - name: status
+        tests:
+          - accepted_values:
+              values: ['placed', 'shipped', 'completed', 'returned']
+      - name: customer_id
+        tests:
+          - relationships:
+              to: ref('customers')
+              field: id
+```
+
+You can also install generic tests from a package, or write your own. Generic tests tend to be much more common - they should make up the bulk of your dbt testing suite.
+
+#### Singular test
+You can extend tests to suit business logic specific to your organization. Any select query can be turned into a test, in the "test" folder. 
+
+Singular test example "tests/assert_total_payment_amount_is_positive.sql":
+```sql
+select
+    order_id,
+    sum(amount) as total_amount
+from {{ ref('fct_payments' )}}
+group by 1
+having not(total_amount >= 0)
+```
+
+If you find yourself writing the same basic structure over and over, consider converting it into a generic test, which takes arguments. Such as the below definition:
+```sql
+{% test not_null(model, column_name) %}
+    select *
+    from {{ model }}
+    where {{ column_name }} is null
+{% endtest %}
+```
+
+The parameters makes the test "generic". Then, you can use it in yml files. 
+
+#### Summary
+Normally, a test query will calculate failures as part of its execution. 
+
+If you set the optional `--store-failures` flag or `store_failures` in config, dbt will save test query results to the table `dbt_test__audit`, and then query that table, to calculate the number of failures.
+
+You can then query the table directly (dbt will give you the command to run in command output), and examine failing records much more quickly, in dev. 
+
+In this table, a test's results will always replace prev failures, for the same test.
+
+Commands: 
+- To test a specific model: `dbt test --select my_model`
+- To test all sources: `dbt test --select source:*`
+- To test one source (including all tables inside it): `dbt test --select source:jaffle_shop`
+- To test one table in a source: `dbt test --select source:jaffle_shop.orders`
+
+Recommendations:
+- Every model has a test on a primary key
+- Test any assumptions on your source data
+- In advanced dbt projects, use sources, and run these source data-integrity tests against the sources, rather than models.
+
+You should run your tests whenever you are writing new code (to ensure you haven't broken any existing models by changing SQL), and, whenever you run jobs in prod (to ensure that your assumptions about your source data are still valid).
+
+You can use the `error_if`/`warn_if` configs, to set custom failure thresholds in your tests.
+
+To test a composite primary key, the the `dbt_utils.unique_combination_of_columns test` is most performant. 
 
 ### Jinja and macros
 
