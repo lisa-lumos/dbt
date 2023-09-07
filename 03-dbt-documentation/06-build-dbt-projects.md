@@ -291,8 +291,88 @@ You can use the `error_if`/`warn_if` configs, to set custom failure thresholds i
 To test a composite primary key, the the `dbt_utils.unique_combination_of_columns test` is most performant. 
 
 ### Jinja and macros
+Jinja allow you to do things, that aren't normally possible in SQL, such as:
+- Use `if` statement, `for` loops, etc
+- Use env vars for prod
+- Have different behaviors for different targets
+- pivot, union with simple syntax
+- Abstract SQL snippets into reusable macros
 
+Basically, it allow you to create repeatable parts in a "sql query text" quickly. 
 
+For example, "/models/order_payment_method_amounts.sql":
+```sql
+{% set payment_methods = ["bank_transfer", "credit_card", "gift_card"] %}
+
+select
+    order_id,
+    {% for payment_method in payment_methods %}
+    sum(case when payment_method = '{{payment_method}}' then amount end) as {{payment_method}}_amount,
+    {% endfor %}
+    sum(amount) as total_amount
+from app_data.payments
+group by 1
+```
+which compiles to below sql text:
+```sql
+select
+    order_id,
+    sum(case when payment_method = 'bank_transfer' then amount end) as bank_transfer_amount,
+    sum(case when payment_method = 'credit_card' then amount end) as credit_card_amount,
+    sum(case when payment_method = 'gift_card' then amount end) as gift_card_amount,
+    sum(amount) as total_amount
+from app_data.payments
+group by 1
+```
+
+Jinja is recognized based on the delimiters:
+- Expressions `{{ ... }}`: To output a string. Can reference variables, and call macros.
+- Statements `{% ... %}`: For control flow, like loops and if statements, or to define macros.
+- Comments `{# ... #}`
+
+Jinja Macros are code snippets that can be reused multiple times, like functions. 
+
+For example, "macros/cents_to_dollars.sql":
+```sql
+{% macro cents_to_dollars(column_name, scale=2) %}
+    ({{ column_name }} / 100)::numeric(16, {{ scale }})
+{% endmacro %}
+```
+To use this macro, "models/stg_payments.sql":
+```sql
+select
+  id as payment_id,
+  {{ cents_to_dollars('amount') }} as amount_usd
+from app_data.payments
+```
+which compiles to:
+```sql
+select
+  id as payment_id,
+  (amount / 100)::numeric(16, 2) as amount_usd
+from app_data.payments
+```
+
+To document a macro:
+```yml
+version: 2
+
+macros:
+  - name: cents_to_dollars
+    description: A macro to convert cents to dollars
+    arguments:
+      - name: column_name
+        type: string
+        description: The name of the column you want to convert
+      - name: precision
+        type: integer
+        description: Number of decimal places. Defaults to 2.
+```
+
+Jinja dbt best practices:
+1. Favor readability over DRY-ness
+2. Leverage package macros, do not re-invent the wheel
+3. Set variables at the top of a model
 
 ### Sources
 Sources make it possible to name/describe the source data. By declaring them as sources in dbt, you can then:
