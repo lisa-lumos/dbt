@@ -513,13 +513,47 @@ Once an exposure is defined, you can run commands that reference it:
 - `dbt test -s +exposure:weekly_jaffle_report`
 
 ### Metrics
-The `dbt_metrics` package has been deprecated, and replaced with `MetricFlow`, a new framework for metrics in dbt. The new Semantic Layer is available to Team/Enterprise multi-tenant dbt Cloud plans hosted in North America. You must be on dbt v1.6 &+ to access it. 
+The `dbt_metrics` package has been deprecated, and replaced with `MetricFlow`, a new framework for metrics in dbt. 
 
+The new Semantic Layer is available to Team/Enterprise multi-tenant dbt Cloud plans hosted in North America. You must be on dbt `v1.6 &+` to access it. 
+
+The dbt_metrics package and the legacy Semantic Layer, available in `dbt v1.5 or lower`, are no longer supported and won't receive any code fixes.
+
+If you've defined metrics using dbt_metrics, or integrated with the legacy Semantic Layer, we highly recommend you upgrade your dbt version to `dbt v1.6 or higher` to use MetricFlow or the new dbt Semantic Layer. To migrate to the new Semantic Layer, refer to the dedicated migration guide for more info.
 
 ### Groups
+Was first introduced in `dbt v1.5`. 
 
+A group is a collection of nodes within a dbt DAG. Groups are named, and every group has an owner. They enable collaboration within/across teams, by restricting access to private models.
+
+Group members may include models, tests, seeds, snapshots, analyses, and metrics. (Not included: sources and exposures.) Each node belong to only one group.
+
+For example, to define a group, "models/marts/finance/finance.yml":
+```yml
+groups:
+  - name: finance
+    owner:
+      email: finance@jaffleshop.com # require 'name' or 'email'
+      slack: finance-data
+      github: finance-data-team
+```
+
+To add models to a group, it can be done at project/model/in-file level. 
+
+By default, all models within a group have the `protected` access modifier. This means, they can be referenced by downstream resources in any group, in the same project, using the ref function. If a grouped model's access property is set to `private`, only resources within its group can reference it.
 
 ### Analyses
+
+
+
+
+
+
+
+
+
+
+
 
 ## Build your metrics
 
