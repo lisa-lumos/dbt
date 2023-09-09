@@ -543,21 +543,24 @@ To add models to a group, it can be done at project/model/in-file level.
 By default, all models within a group have the `protected` access modifier. This means, they can be referenced by downstream resources in any group, in the same project, using the ref function. If a grouped model's access property is set to `private`, only resources within its group can reference it.
 
 ### Analyses
+The "analytical" sql files can be versioned inside of your dbt project, using the "analysis".
 
+Any sql files found in the "analyses/" dir of a dbt project will be compiled, but not executed.
 
-
-
-
-
-
-
-
-
-
+To compile analysis into runnable sql, run  `dbt compile`. Find the compiled sql in the "target/compiled/{project name}/analyses/" folder. 
 
 ## Build your metrics
+Use `MetricFlow` in dbt to centrally define your metrics. As a key component of the dbt Semantic Layer, MetricFlow is responsible for SQL query construction, and defining specifications for dbt semantic models/metrics.
 
 ### Get started with MetricFlow
+
+
+
+
+
+
+
+
 
 ### About MetricFlow
 #### Joins
