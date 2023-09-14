@@ -553,13 +553,74 @@ To compile analysis into runnable sql, run  `dbt compile`. Find the compiled sql
 Use `MetricFlow` in dbt to centrally define your metrics. As a key component of the dbt Semantic Layer, MetricFlow is responsible for SQL query construction, and defining specifications for dbt semantic models/metrics.
 
 ### Get started with MetricFlow
+dbt semantic models consist of entities, dimensions, and measures.
 
+It's best practice to create semantic models in the "/models/semantic_models" directory in your project. 
 
+For example, to create a semantic model, "orders.yml":
+```yml
+semantic_models:
+  #The name of the semantic model.
+  - name: orders
+    defaults:
+      agg_time_dimension: ordered_at
+    description: |
+      Order fact table. This table is at the order grain with one row per order. 
+    
+    # The name of the dbt model and schema
+    model: ref('orders')
 
+    # Entities. These usually correspond to keys in the table.
+    entities:
+      - name: order_id
+        type: primary
+      - name: location
+        type: foreign
+        expr: location_id
+      - name: customer
+        type: foreign
+        expr: customer_id
 
+    # Measures. Are the aggs on the columns in the table.
+    measures: 
+      - name: order_total
+        description: The total revenue for each order.
+        agg: sum
+      - name: order_count
+        expr: 1
+        agg: sum
+      - name: tax_paid
+        description: The total tax paid on each order. 
+        agg: sum
+      - name: customers_with_orders
+        description: Distinct count of customers placing orders
+        agg: count_distinct
+        expr: customer_id
+      - name: locations_with_orders
+        description: Distinct count of locations with order
+        expr: location_id
+        agg: count_distinct
+      - name: order_cost
+        description: The cost for each order item. Cost is calculated as a sum of the supply cost for each order item. 
+        agg: sum
 
+    # Dimensions. type: categorical/time. 
+    # Add additional context to metrics. 
+    dimensions:
+      - name: ordered_at
+        type: time
+        type_params:
+          time_granularity: day 
+      - name: order_total_dim
+        type: categorical
+        expr: order_total
+      - name: is_food_order
+        type: categorical
+      - name: is_drink_order
+        type: categorical  
+```
 
-
+Define metrics. 
 
 
 ### About MetricFlow
