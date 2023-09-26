@@ -620,10 +620,37 @@ semantic_models:
         type: categorical  
 ```
 
-Define metrics. 
+Define metrics. You can define metrics in the same YAML files as your semantic models, or create a new file - you can put them into the "/models/metrics" dir. The file structure for metrics can become more complex, if you need to organize your metrics by data source, business line, etc.
 
+For example: 
+```yml
+metrics:
+  - name: order_total
+    description: Sum of total order amount. Includes tax + revenue.
+    type: simple
+    label: Order Total
+    type_params:
+      measure: order_total
+```
+
+Configure the MetricFlow time spine model. MetricFlow requires a time spine for certain metric types and join resolution patterns, like cumulative metrics. You have to create this model in your dbt project. 
+
+You can use the Preview/Compile buttons in the IDE to run semantic validations, and make sure your metrics are defined.
+
+You can test/query metrics locally, using the MetricFlow CLI (dbt Cloud IDE support coming soon, as of v1.6).
+
+Once you define metrics in your dbt project, you can perform a job run in your dbt Cloud prod env to materialize your metrics (dev coming soon). Only the prod env is supported for the dbt Semantic Layer at this moment. Your metric appear as a red node in the DAG.
+
+You can set up the dbt Semantic Layer in dbt Cloud at the environment and project level.
+
+You can query your metrics in a JDBC-enabled tool or use existing first-class integrations with the dbt Semantic Layer.
+
+The dbt Semantic Layer is proprietary, however, some components of the dbt Semantic Layer are open source, like dbt-core and MetricFlow.
 
 ### About MetricFlow
+
+
+
 #### Joins
 
 #### Validations
