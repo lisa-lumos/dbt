@@ -648,6 +648,29 @@ You can query your metrics in a JDBC-enabled tool or use existing first-class in
 The dbt Semantic Layer is proprietary, however, some components of the dbt Semantic Layer are open source, like dbt-core and MetricFlow.
 
 ### About MetricFlow
+MetricFlow is a `SQL query generation engine` that helps you create metrics by constructing appropriate queries for different granularities/dimensions that are useful for various business applications.
+
+It uses YAML files to define a semantic graph, which maps language to data. This graph consists of semantic models, which serve as data entry points, and metrics, which are functions used to create new quantitative indicators.
+
+the semantic graph is a subset of the DAG, and you can see the semantic models as nodes on the DAG. The connections between tables in the semantic graph are more about relationships between the information. 
+
+Semantic models are the starting points of data and correspond to models in your dbt project. You can create multiple semantic models from each model. For a semantic model, there are 3 main pieces of metadata:
+- Entities. The join keys of your semantic model (the traversal paths/edges between semantic models).
+- Dimensions. The ways you want to group your metrics.
+- Measures. The aggregation functions that return a numeric result, and can be used to create metrics.
+
+Metrics. 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
