@@ -659,9 +659,13 @@ Semantic models are the starting points of data and correspond to models in your
 - Dimensions. The ways you want to group your metrics.
 - Measures. The aggregation functions that return a numeric result, and can be used to create metrics.
 
-Metrics. 
+Metrics are functions that combine measures/constraints/mathematical-functions to define new quantitative indicators. 
 
-
+MetricFlow supports 4 metric types:
+- Cumulative. Aggregates a measure over a given window.
+- Derived. An expression using other metrics.
+- Ratio. Create a ratio out of two measures, like revenue per customer.
+- Simple. Metrics that refer directly to one measure.
 
 
 
