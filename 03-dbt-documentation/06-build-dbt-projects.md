@@ -667,16 +667,64 @@ MetricFlow supports 4 metric types:
 - Ratio. Create a ratio out of two measures, like revenue per customer.
 - Simple. Metrics that refer directly to one measure.
 
+Use case. 
 
+How data practitioners typically calculate the agged order_total metric:
+```sql
+select
+    date_trunc('day',orders.ordered_at) as day, 
+    case when customers.first_ordered_at is not null then true else false end as is_new_customer,
+    sum(orders.order_total) as order_total
+from orders
+left join customers
+  on orders.customer_id = customers.customer_id
+group by 1, 2
+```
 
-
-
-
-
-
-
-
-
+With MetricFlow:
+```yml
+semantic_models:
+  - name: orders    # The name of the semantic model
+    description: |
+      A model containing order data. The grain of the table is the order id.
+    model: ref('orders') #The name of the dbt model and schema
+    defaults:
+      agg_time_dimension: metric_time
+    entities: # Entities, which usually correspond to keys in the table. 
+      - name: order_id
+        type: primary
+      - name: customer
+        type: foreign
+        expr: customer_id
+    measures:   # Measures, which are the aggregations on the columns in the table.
+      - name: order_total
+        agg: sum
+    dimensions: # Dimensions are either categorical or time. They add additional context to metrics and the typical querying pattern is Metric by Dimension.
+      - name: metric_time
+        expr: cast(ordered_at as date)
+        type: time
+        type_params:
+          time_granularity: day
+  - name: customers    # The name of the second semantic model
+    description: >
+      Customer dimension table. The grain of the table is one row per
+        customer.
+    model: ref('customers') #The name of the dbt model and schema
+    defaults:
+      agg_time_dimension: first_ordered_at
+    entities: # Entities, which  usually correspond to keys in the table.
+      - name: customer 
+        type: primary
+        expr: customer_id
+    dimensions: # Dimensions are either categorical or time. They add additional context to metrics and the typical querying pattern is Metric by Dimension.
+      - name: is_new_customer
+        type: categorical
+        expr: case when first_ordered_at is not null then true else false end
+      - name: first_ordered_at
+        type: time
+        type_params:
+          time_granularity: day
+```
 
 #### Joins
 
