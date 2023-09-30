@@ -727,6 +727,18 @@ semantic_models:
 ```
 
 #### Joins
+With Joins, you can also create metrics using measures from different semantic models.
+
+Joins use "entities" defined in your semantic model configs as the join keys between tables. MetricFlow creates a graph using the semantic models as nodes, and the join paths as edges, to perform joins automatically. MetricFlow chooses the appropriate join type, and avoids fan-out, or chasm joins with other tables based on the entity types.
+
+Fan-out joins are when one row in a table is joined to multiple rows in another table, resulting in more output rows than input rows.
+
+Chasm joins are when two tables have a many-to-many relationship through an intermediate table, and the join causes duplicate/missing data.
+
+MetricFlow primarily uses left joins for joins, and restricts the use of fan-out and chasm joins.
+
+
+
 
 #### Validations
 
