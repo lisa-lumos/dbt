@@ -737,6 +737,9 @@ Chasm joins are when two tables have a many-to-many relationship through an inte
 
 MetricFlow primarily uses left joins for joins, and restricts the use of fan-out and chasm joins.
 
+Joins: Joins use "entities" defined in your semantic model configs as the join keys between tables. 
+
+Validations: 
 
 
 
