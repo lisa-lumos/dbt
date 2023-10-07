@@ -739,11 +739,13 @@ MetricFlow primarily uses left joins for joins, and restricts the use of fan-out
 
 Joins: Joins use "entities" defined in your semantic model configs as the join keys between tables. 
 
-Validations: 
-
-
-
 #### Validations
+Validations ensure that configuration files follow the expected schema, the semantic graph doesn't violate any constraints, and semantic definitions in the graph exist in the physical table - providing effective data governance support.
+
+There are 3 built-in validations, which occur sequentially, and must succeed before proceeding to the next step:
+- Parsing. Ensure config files follow the defined schema for each semantic graph object, and can be parsed successfully
+- Semantic. A suite of tests to ensure that your semantic graph doesn't violate any constraints
+- Data platform. Checks if the semantic definitions in your semantic graph exist in the underlying physical table
 
 #### MetricFlow time spine
 
