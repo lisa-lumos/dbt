@@ -748,10 +748,13 @@ There are 3 built-in validations, which occur sequentially, and must succeed bef
 - Data platform. Checks if the semantic definitions in your semantic graph exist in the underlying physical table
 
 #### MetricFlow time spine
+MetricFlow uses a timespine table to construct cumulative metrics. It expects this table to be named "metricflow_time_spine", which can be created as a model in dbt.
 
 #### MetricFlow CLI commands
+skipped.
 
 ### Semantic models
+
 #### Dimensions
 
 #### Entities
