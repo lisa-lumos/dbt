@@ -754,27 +754,31 @@ MetricFlow uses a timespine table to construct cumulative metrics. It expects th
 skipped.
 
 ### Semantic models
-
+skipped
 #### Dimensions
-
 #### Entities
-
 #### Measures
 
 ### Metrics
+skipped
 #### Cumulative
-
 #### Derived
-
 #### Ratio
-
 #### Simple
 
-
 ## Enhance your models
+
 ### Materializations
+5 sql materializations types in dbt:
+- table. Recommended for models that feed to BI tools. Also for those with slow transformations and have many downstream models. 
+- view. (default)
+- incremental. Best for event-style data. Or use it when model takes too long to run. 
+- ephemeral. Works like a CTE. de-clutters the logic, but overusing can make queries harder to debug. 
+- materialized view. db platform specific. 
 
-
+2 Python materializations in dbt:
+- table
+- incremental
 
 ### Incremental models
 
