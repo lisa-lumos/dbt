@@ -781,6 +781,23 @@ skipped
 - incremental
 
 ### Incremental models
+The first time a incremental model is run, the table is built by transforming all rows of source data. On subsequent runs, dbt transforms only the rows in your source data that you tell dbt to filter for, inserting them into the target table which is the table that has already been built.
+
+To capture both new and updated records, you need to define a unique key to ensure you don't bring in modified records as duplicates. It will then check for rows created/modified since the last time dbt ran this model.
+
+Using an incremental model limits the amount of data that needs to be transformed, vastly reducing the runtime of your transformations.
+
+For more complex incremental models with CTEs, you should consider the impact of the position of the is_incremental() macro on query performance. In some warehouses, filtering your records early can vastly improve the run time of your query!
+
+You can choose only specific cols to update. 
+
+
+
+
+
+
+
+
 
 
 
