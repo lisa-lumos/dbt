@@ -781,6 +781,8 @@ skipped
 - incremental
 
 ### Incremental models
+Behind the scene, it is a merge statement. 
+
 The first time a incremental model is run, the table is built by transforming all rows of source data. On subsequent runs, dbt transforms only the rows in your source data that you tell dbt to filter for, inserting them into the target table which is the table that has already been built.
 
 To capture both new and updated records, you need to define a unique key to ensure you don't bring in modified records as duplicates. It will then check for rows created/modified since the last time dbt ran this model.
@@ -791,17 +793,47 @@ For more complex incremental models with CTEs, you should consider the impact of
 
 You can choose only specific cols to update. 
 
+It's often desirable to build models as tables, so downstream queries are more performant. But it will take time to build when:
+- source data tables have millions, or even billions, of rows.
+- the transformations on the source data are computationally expensive
 
+Incremental models are a trade-off between complexity and performance.
 
+Incremental models can be configured to include an optional on_schema_change parameter to enable additional control when incremental model columns change. 
 
+Default behavior: ignore. If you add/remove a column to your incremental model, and execute a dbt run, this column will not appear/disappear in your target table.
 
+If you are using the merge strategy and have specified a unique_key, by default, dbt will entirely overwrite matched rows with new values.
 
+On adapters which support the merge strategy (including Snowflake, BigQuery, Apache Spark, and Databricks), you may optionally pass a list of column names to a merge_update_columns config. In that case, dbt will update only the columns specified by the config, and keep the previous values of other columns. Alternatively, you can specify a list of columns to exclude from being updated by passing a list of column names
 
-
-
-
-
-
+`incremental_predicates` allows additional merge condition, such as 
+```sql
+{{
+  config(
+    materialized = 'incremental',
+    unique_key = 'id',
+    cluster_by = ['session_start'],  
+    incremental_strategy = 'merge',
+    incremental_predicates = [
+      "DBT_INTERNAL_DEST.session_start > dateadd(day, -7, current_date)"
+    ]
+  )
+}}
+```
+translates to 
+```sql
+merge into <existing_table> DBT_INTERNAL_DEST
+from <temp_table_with_new_records> DBT_INTERNAL_SOURCE
+on
+    -- unique key
+    DBT_INTERNAL_DEST.id = DBT_INTERNAL_SOURCE.id
+    and
+    -- custom predicate: limits data scan in the "old" data / existing table
+    DBT_INTERNAL_DEST.session_start > dateadd(day, -7, current_date)
+when matched then update ...
+when not matched then insert ...
+```
 
 ## Enhance your code
 ### Project variables
