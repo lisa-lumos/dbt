@@ -837,8 +837,18 @@ when not matched then insert ...
 
 ## Enhance your code
 ### Project variables
+Variables can be used to pass data to models for compilation.
 
+Variables can be scoped globally, or to a specific package imported in your project.
 
+Variables that barely change can be defined in "dbt_project.yml" file. You can also define/override variables for a specific run of dbt, in the command line. 
+
+The more specific variable declaration takes precedence over less specific ones:
+1. The variables defined on the command line with --vars.
+2. The package-scoped variable declaration in the root "dbt_project.yml" file
+3. The global variable declaration in the root "dbt_project.yml" file
+4. If this node is defined in a package: variable declarations in that package's "dbt_project.yml" file
+5. The variable's default argument (if provided)
 
 ### Environment variables
 
