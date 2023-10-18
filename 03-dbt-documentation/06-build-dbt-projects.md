@@ -883,15 +883,17 @@ from users_aggregated
 ```
 
 ### Packages
+By adding a package to your project, the package's models and macros will become part of your own project
 
+Where possible, install packages via dbt Hub, since this allows dbt to handle duplicate dependencies. 
 
+Pinning a Git package revision helps prevent your code from changing without your explicit approval.
 
+Some organizations have security requirements, to pull resources only from internal services. To address the need to install packages from hosted environments such as Artifactory, or cloud storage buckets, dbt Core enables you to install packages from internally-hosted tarball URLs.
 
+Private packages can be cloned via SSH and an SSH key.
 
-
-
-
-
+A "local" package is a dbt project accessible from your local file system. You can install it by specifying the project's path. It works best when you nest the project within a subdirectory relative to your current project's directory.
 
 ### Hooks and operations
 
