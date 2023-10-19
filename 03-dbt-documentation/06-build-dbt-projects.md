@@ -896,7 +896,25 @@ Private packages can be cloned via SSH and an SSH key.
 A "local" package is a dbt project accessible from your local file system. You can install it by specifying the project's path. It works best when you nest the project within a subdirectory relative to your current project's directory.
 
 ### Hooks and operations
+Database administration sometimes requires additional SQL statements to be run, e.g.:
+- Creating UDFs
+- Managing row/column-level permissions
+- Vacuuming tables on Redshift
+- Creating partitions in Redshift Spectrum external tables
+- Resuming/pausing/resizing warehouses in Snowflake
+- Refreshing a pipe in Snowflake
+- Create a share on Snowflake
+- Cloning a database on Snowflake
+- Analyze table, alter table set property, alter table ... add row access policy
 
+dbt provides hooks and operations, so you can version control and execute these statements, as part of your dbt project.
+
+Hooks are snippets of SQL that are executed at different times:
+- pre/post-hook: executed before/after a model/seed/snapshot is built.
+- on-run-start: executed at the start of dbt build/compile/docs-generate/run/seed/snapshot/test.
+- on-run-end: executed at the end of dbt build/compile/docs-generate/run/seed/snapshot/test.
+
+Operations are macros that you can run directly, using the `run-operation` command. It is a convenient way to invoke a macro directly, without needing to run a model.
 
 ## Organize your outputs
 ### Custom schemas
@@ -912,46 +930,6 @@ A "local" package is a dbt project accessible from your local file system. You c
 
 
 ### Custom target names
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
