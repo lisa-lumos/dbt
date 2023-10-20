@@ -918,6 +918,10 @@ Operations are macros that you can run directly, using the `run-operation` comma
 
 ## Organize your outputs
 ### Custom schemas
+By default, all dbt models are built in the schema specified in your target. In dbt projects with lots of models, it may be useful to instead build some models in schemas other than your target schema - this can help logically group models together.
+
+You can use "custom schemas" in dbt to build models in a schema other than your target schema. By default, dbt generates the schema name for a model, by postfixing the "custom schema" to the "target schema".
+
 
 
 
