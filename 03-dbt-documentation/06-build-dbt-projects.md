@@ -922,10 +922,28 @@ By default, all dbt models are built in the schema specified in your target. In 
 
 You can use "custom schemas" in dbt to build models in a schema other than your target schema. By default, dbt generates the schema name for a model, by postfixing the "custom schema" to the "target schema".
 
+Advanced custom schema configuration: You can customize schema name generation in dbt, depending on your needs, such as creating a custom macro named generate_schema_name in your project, or, using the built-in macro for environment-based schema names. 
 
+A common way to generate schema names, is by adjusting the behavior, according to the environment in dbt:
+- Production environment. If a custom schema is specified, the schema name of a model is the custom schema, instead of concatenating to the target schema. If no custom schema is specified, the schema name of a model is the target schema.
+- Other environments (like development or quality assurance (QA)): Build all models in the target schema, ignoring any custom schema configurations.
 
+dbt ships with a global, predefined macro that contains this logic - `generate_schema_name_for_env`. When using this macro, you need to set the target name in your job specifically to "prod", if you want custom schemas to be applied. Globally-scoped variables, and variables defined on the command line, are accessible in the generate_schema_name context.
+
+For different envs, recommend:
+- dev: configured in a profiles.yml file on your computer.
+- ci: A continuous integration environment running on Pull Requests in GitHub, GitLab, etc.
+- prod: The production deployment of your dbt project.
 
 ### Custom databases
+
+
+
+
+
+
+
+
 
 
 
