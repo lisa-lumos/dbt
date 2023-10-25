@@ -936,16 +936,13 @@ For different envs, recommend:
 - prod: The production deployment of your dbt project.
 
 ### Custom databases
+The database that dbt models are built into, can be configured using the `database` model configuration:
+- If this config is not supplied to a model, then dbt will use the database from "profiles.yml" file, the one for the active target. 
+- If the `database` config is supplied for a model, then dbt will use this database.
 
+The `database` config can be supplied for groups of models in the "dbt_project.yml" file, or for individual models in their SQL files.
 
-
-
-
-
-
-
-
-
+The database name generated for a model is controlled by a macro called `generate_database_name`. This macro can be overridden in a dbt project to change how dbt generates model database names. This macro works similarly to the `generate_schema_name` macro.
 
 ### Custom aliases
 
