@@ -945,8 +945,9 @@ The `database` config can be supplied for groups of models in the "dbt_project.y
 The database name generated for a model is controlled by a macro called `generate_database_name`. This macro can be overridden in a dbt project to change how dbt generates model database names. This macro works similarly to the `generate_schema_name` macro.
 
 ### Custom aliases
+By default, dbt uses the filename of the model as the name for the corresponding table/view in the database. This name can be overridden using the `alias` model configuration.
 
-
+The alias generated for a model is controlled by a macro called `generate_alias_name`. This macro can be overridden in a dbt project to change how dbt aliases models. This macro works similarly to the `generate_schema_name` macro.
 
 ### Custom target names
 
