@@ -950,9 +950,15 @@ By default, dbt uses the filename of the model as the name for the corresponding
 The alias generated for a model is controlled by a macro called `generate_alias_name`. This macro can be overridden in a dbt project to change how dbt aliases models. This macro works similarly to the `generate_schema_name` macro.
 
 ### Custom target names
+You can define a custom target name for any dbt Cloud job to correspond to settings in your dbt project. So logic in your dbt project can behave differently, depending on the specified target. e.g.:
+```sql
+select *
+from a_big_table
 
+-- limit the amount of data queried in dev
+{% if target.name != 'prod' %}
+where created_at > date_trunc('month', current_date)
+{% endif %}
+```
 
-
-
-
-
+In dbt cloud, you can set a custom target name in your "development credentials".
