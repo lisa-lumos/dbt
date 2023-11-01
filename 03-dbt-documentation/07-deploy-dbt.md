@@ -22,7 +22,16 @@ In dbt Cloud, the setting to provision memory available to a job is defined at t
 The scheduler prevents queue clog by canceling runs that aren't needed, ensuring there is only one run of the job in the queue, at any given time. If a newer run is queued, the scheduler cancels any previously queued run for that job, and displays an error message.
 
 ## Deployment environments
+envs determine the settings used during job runs, including:
+- The version of dbt Core used to run the project
+- The warehouse connection info, the target database/schema settings
+- The version of your code to execute
 
+Each dbt Cloud project can only have a single development environment but can have any number of deployment(prod) environments.
+
+By default, all envs will use the default branch in your repo (usually the main branch), when accessing your dbt code. This is overridable within each dbt Cloud Environment, using the "Default to a custom branch" option.
+
+Warehouse connections are set at the Project level for dbt Cloud accounts, and each Project can have one connection (Snowflake account, Redshift host, Bigquery project, Databricks host, etc.).
 
 ## Continuous integration
 
