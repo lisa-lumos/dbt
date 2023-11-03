@@ -57,17 +57,24 @@ When you push a new commit to a PR, dbt Cloud enqueues a new CI run for the late
 
 ## Jobs
 ### About Jobs
-
-
-
-
-
-
-
-
-
+In dbt Cloud, there are two types of jobs:
+- Deploy jobs. To create and set up triggers for building production data assets
+- Continuous integration (CI) jobs. To create and set up triggers for checking code changes
 
 ### Deploy jobs
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### CI jobs
 
