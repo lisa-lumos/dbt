@@ -62,19 +62,9 @@ In dbt Cloud, there are two types of jobs:
 - Continuous integration (CI) jobs. To create and set up triggers for checking code changes
 
 ### Deploy jobs
+You must have a dbt Cloud account, and Developer seat license. 
 
-
-
-
-
-
-
-
-
-
-
-
-
+Use tools such as crontab.guru to generate the correct cron syntax. 
 
 ### CI jobs
 
