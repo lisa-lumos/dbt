@@ -67,8 +67,23 @@ You must have a dbt Cloud account, and Developer seat license.
 Use tools such as crontab.guru to generate the correct cron syntax. 
 
 ### CI jobs
+dbt Labs recommends that you create your CI job in a dedicated dbt Cloud deployment environment that's connected to a staging database. 
+
+You can set the CI runs to be triggered by not only by pull requests, but also on draft pull request. 
+
+You can set the commands to run during a CI job, the default is `dbt build -s state:modified+`, which runs only new/changed models and all their downstream models. 
+
+Compare changes against an environment (Deferral): By default, it's set to the prod env. It allows dbt Cloud to check the state of the code in the PR, against the code running in the deferred environment, to only check the modified code, instead of building the full table or the entire DAG.
+
+You can also trigger a CI job via the API. 
 
 ### Job commands
+
+
+
+
+
+
 
 
 ## Monitor jobs and alerts
