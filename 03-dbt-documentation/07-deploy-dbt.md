@@ -78,13 +78,11 @@ Compare changes against an environment (Deferral): By default, it's set to the p
 You can also trigger a CI job via the API. 
 
 ### Job commands
+A dbt Cloud production job allows you to set up scheduled dbt job runs/commands, rather than running dbt commands manually from the command line or IDE. 
 
+During a job run, the dbt built-in commands are chained together. If one of the run steps in the chain fails, then the next commands aren't executed, and the entire job fails with an "Error" status.
 
-
-
-
-
-
+dbt Cloud executes the dbt source freshness command as the first run step in your job. If that particular run step in your job fails, the job can still succeed if all subsequent run steps are successful.
 
 ## Monitor jobs and alerts
 
