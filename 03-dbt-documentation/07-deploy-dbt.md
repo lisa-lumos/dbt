@@ -85,14 +85,20 @@ During a job run, the dbt built-in commands are chained together. If one of the 
 dbt Cloud executes the dbt source freshness command as the first run step in your job. If that particular run step in your job fails, the job can still succeed if all subsequent run steps are successful.
 
 ## Monitor jobs and alerts
-
-### Monitor jobs and alerts
+View run history; Rerun jobs; job notifications; webhooks to sent job status to other systems; source freshness; ...
 
 ### Run visibility
+View run history of the past year. 
+
+View/download logs. 
+
+View model timing dashboard, identify performance bottlenecks. 
 
 ### Retry jobs
+If your dbt job run completed with a status of Error, you can rerun it from start or from the point of failure in dbt Cloud.
 
 ### Job notifications
+Email/Slack notifications. 
 
 ### Webhooks
 
