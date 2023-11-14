@@ -115,7 +115,7 @@ As a good rule of thumb, you should run your source freshness jobs with at least
 In dbt Cloud, the Discovery API can power Dashboard Status Tiles. A Dashboard Status Tile is placed on a dashboard (specifically: anywhere you can embed an iFrame) to give insight into the quality and freshness of the data feeding into that dashboard. This is done via dbt exposures.
 
 ## Integrate with other tools
-
+Schedule and run your dbt jobs with the help of tools such as Airflow, Prefect, Dagster, automation server, Cron, and Azure Data Factory (ADF)
 
 
 
