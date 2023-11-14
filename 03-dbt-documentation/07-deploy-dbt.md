@@ -101,12 +101,18 @@ If your dbt job run completed with a status of Error, you can rerun it from star
 Email/Slack notifications. 
 
 ### Webhooks
+you can create outbound webhooks to send events (notifications) about your dbt jobs to your other systems. Your other systems can listen for (subscribe to) these events to further automate your workflows or to help trigger automation flows you have set up.
 
 ### Artifacts
+for dbt docs and source freshness reporting. 
 
 ### Source freshness
+When a dbt Cloud job is configured to snapshot source data freshness, dbt Cloud will render a user interface showing you the state of the most recent snapshot. This interface is intended to help you determine if your source data freshness is meeting the service level agreement (SLA) that you've defined for your organization.
+
+As a good rule of thumb, you should run your source freshness jobs with at least double the frequency of your lowest SLA.
 
 ### Dashboard status tiles
+In dbt Cloud, the Discovery API can power Dashboard Status Tiles. A Dashboard Status Tile is placed on a dashboard (specifically: anywhere you can embed an iFrame) to give insight into the quality and freshness of the data feeding into that dashboard. This is done via dbt exposures.
 
 ## Integrate with other tools
 
