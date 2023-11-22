@@ -36,7 +36,19 @@ Models can be grouped under a common designation with a shared owner. For exampl
 Models can set an access modifier to indicate their intended level of accessibility. By default, all models are `protected`. This means that other models in the same project can reference them, regardless of their group. 
 
 ### Model contracts
+For some models, constantly changing the shape of its returned dataset poses a risk, when other people and processes are querying that model. It's better to define a set of upfront "guarantees", that define the shape of your model. 
 
+We call this set of guarantees a "contract." While building your model, dbt will verify that your model's transformation will produce a dataset matching up with its contract, or it will fail to build.
+
+When building a model with a defined contract, dbt will do two things differently:
+1. dbt will run a "preflight" check, to ensure that the model's query will return a set of columns with names and data types matching the ones you have defined. This check is agnostic to the order of columns specified in your model (SQL) or YAML spec.
+2. dbt will include the column names, data types, and constraints in the DDL statements it submits to the data platform, which will be enforced while building or updating the model's table.
+
+Note that Snowflake only enforces the "not null" constraint. 
+
+A model's contract defines the shape of the returned dataset. If the model's logic or input data doesn't conform to that shape, the model does not build.
+
+Tests are a more flexible mechanism for validating the content of your model, after it's built. So long as you can write the query, you can run the test. Tests are more configurable, such as with custom severity thresholds. They are easier to debug after finding failures, because you can query the already-built model, or store the failing records in the data warehouse.
 
 ### Model versions
 
