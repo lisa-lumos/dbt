@@ -51,12 +51,11 @@ A model's contract defines the shape of the returned dataset. If the model's log
 Tests are a more flexible mechanism for validating the content of your model, after it's built. So long as you can write the query, you can run the test. Tests are more configurable, such as with custom severity thresholds. They are easier to debug after finding failures, because you can query the already-built model, or store the failing records in the data warehouse.
 
 ### Model versions
+When sharing a final dbt model with other teams or systems, that model is operating like an API. When the producer of that model needs to make significant changes, how can they avoid breaking the queries of its users downstream?
 
+dbt Core 1.6 introduced first-class support for deprecating models, by specifying a deprecation_date. Taken together, model versions and deprecation offer a pathway for model producers to sunset old models, and consumers the time to migrate across breaking changes.
+
+By enforcing a model's contract, dbt can help you catch unintended changes to column names and data types, that could cause a big headache for downstream queriers. If you're making these changes intentionally, you should create a new model version. If you're making a non-breaking change, you don't need a new version, such as adding a new column, or fixing a bug in an existing column's calculation.
 
 ### Project dependencies
-
-
-
-
-
-
+Projects - A new way to take a dependency on another project. Using a metadata service that runs behind the scenes, dbt Cloud resolves references on-the-fly to public models defined in other projects. You don't need to parse or run those upstream models yourself. Instead, you treat your dependency on those models as an API that returns a dataset. The maintainer of the public model is responsible for guaranteeing its quality and stability.
