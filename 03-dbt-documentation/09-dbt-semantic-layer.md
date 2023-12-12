@@ -27,22 +27,10 @@ Semantic Layer APIs: The interfaces allow users to submit metric queries using G
 
 ## Integrations
 ### Available integrations
-
-
-
-
-
-
-
+Tableau, Google Sheets, Hex, ...
 
 ### Google Sheets (beta)
+skipped
 
 ### Tableau (beta)
-
-
-
-
-
-
-
-
+skipped
