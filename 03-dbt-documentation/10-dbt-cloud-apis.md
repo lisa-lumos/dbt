@@ -31,7 +31,9 @@ Used for getting metadata on your dbt project.
 By leveraging the metadata in dbt Cloud, you can create systems for data monitoring and alerting, lineage exploration, and automated reporting. This can help you improve data discovery, data quality, and pipeline operations, within your organization.
 
 ## Semantic Layer APIs
-
-
-
-
+You can use the dbt Semantic Layer for a variety of tools/applications of data. Some common use cases are:
+- Business intelligence (BI), reporting, and analytics
+- Data quality and monitoring
+- Governance and privacy
+- Data discovery and cataloging
+- Machine learning and data science
