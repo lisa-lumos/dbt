@@ -44,10 +44,10 @@ Deprecated.
 By default, dbt will search for macros in a directory named `macros`. You can override it with `macro-paths: ["my_folder_path"]`. 
 
 ## packages-install-path
-
+By default, dbt will install packages in the "dbt_packages" directory.
 
 ## name
-
+The name of a dbt project.
 
 ## on-run-start & on-run-end
 
