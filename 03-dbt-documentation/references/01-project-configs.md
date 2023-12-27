@@ -50,12 +50,20 @@ By default, dbt will install packages in the "dbt_packages" directory.
 The name of a dbt project.
 
 ## on-run-start & on-run-end
-
+sql to run as hooks. Also take macros. 
 
 ## profile
-
+The profile your dbt project should use to connect to your data warehouse. Not applicable to dbt Cloud. 
 
 ## query-comment
+
+
+
+
+
+
+
+
 
 
 ## quoting
