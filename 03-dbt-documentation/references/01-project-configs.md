@@ -56,70 +56,49 @@ sql to run as hooks. Also take macros.
 The profile your dbt project should use to connect to your data warehouse. Not applicable to dbt Cloud. 
 
 ## query-comment
+A string to inject as a comment, in each query, that dbt runs against your database. This comment can be used to attribute SQL statements to specific dbt resources, like models and tests. Can call a macro
 
-
-
-
-
-
-
-
-
+By default, dbt will insert a JSON comment at the top of your query, containing the information including the dbt version, profile and target names, and node ids for the resources it runs. 
 
 ## quoting
-
+On Snowflake, quoting is set to "false" by default. Creating relations with quoted identifiers makes those them case sensitive. It's much more difficult to select from them. Recommend to avoid this as much as possible.
 
 ## require-dbt-version
+This is a recommended configuration.
 
+Used to restrict your project, to only work with a range of dbt versions. dbt will send a helpful error message, for any user who attempts to run the project, with an unsupported version of dbt. 
+
+This can be useful for package maintainers (such as dbt-utils), to ensure that users' dbt version is compatible with the package. 
+
+Setting this configuration might also help your whole team remain synchronized, on the same version of dbt for local development, to avoid compatibility issues from changed behavior.
+
+If this configuration is not specified, no version check will occur.
 
 ## snapshot-paths
+Optionally specify a custom list of directories, where snapshots are located.
 
+By default, dbt will search for snapshots in the "snapshots" directory. 
 
 ## model-paths
+Optionally specify a custom list of directories, where models and sources are located.
 
+By default, dbt will search for models and sources in the "models" directory. 
 
 ## target-path
+(being deprecated in dbp_project.yml)
 
+Optionally specify a custom directory, where compiled files will be written, when you run the dbt run, dbt compile, or dbt test command.
+
+By default, dbt will write compiled files to the "target" directory. 
 
 ## test-paths
+Optionally specify a custom list of directories, where singular tests are located.
 
+By default, dbt will search for tests in the "tests" directory. 
 
 ## version
+dbt projects have two distinct types of `version` tags. This field has a different meaning, depending on its location.
 
+Starting in dbt version 1.5, `version` in the "dbt_project.yml" is an optional parameter. If used, the version must be in a semantic version format, such as 1.0.0. The default value is None.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Starting from version 1.5, `version` in your resource ".yml" files is optional.
