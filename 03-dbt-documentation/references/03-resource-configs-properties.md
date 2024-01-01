@@ -11,6 +11,7 @@ Some configs can be overridden, some can be additive:
 - `meta` dictionaries are merged (a more specific key-value pair replaces a less specific value with the same key)
 - `pre-hook`/`post-hook` are additive.
 
+Resource path is the nested dictionary keys, that provide the path to a directory of that resource type, or a single instance of that resource type by its name.
 
 ## General properties
 
