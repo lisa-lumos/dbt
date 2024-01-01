@@ -14,6 +14,37 @@ Some configs can be overridden, some can be additive:
 Resource path is the nested dictionary keys, that provide the path to a directory of that resource type, or a single instance of that resource type by its name.
 
 ## General properties
+### columns
+It is the child property of models/sources/seeds/snapshots/analyses. 
+
+Tests can be applied to columns. 
+
+### config
+
+
+### constraints
+
+
+### deprecation_date
+
+
+### description
+
+
+### latest_version
+
+
+### include
+
+
+### quote
+
+
+### Data tests
+
+
+### versions
+
 
 
 
