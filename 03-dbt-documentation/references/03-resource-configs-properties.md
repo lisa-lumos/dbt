@@ -20,32 +20,39 @@ It is the child property of models/sources/seeds/snapshots/analyses.
 Tests can be applied to columns. 
 
 ### config
-
+The child property of models/seeds/snapshots/tests/sources/metrics/exposures. 
 
 ### constraints
+The platform will perform additional validation on data, as it is being populated in a new table, or inserted into a preexisting table. If the validation fails, the table creation or update fails, the operation is rolled back, and you will see an error message.
 
+Can apply PK, expression, unique, not null, foreign_key, etc. 
 
 ### deprecation_date
-
+Provides a mechanism to communicate plans and timelines for long-term support and maintenance, and to facilitate change management.
 
 ### description
-
+A user-defined description. 
 
 ### latest_version
-
+The latest version of this model.
 
 ### include
-
+The specification of which columns are defined in a model's top-level columns property, to include or exclude in a versioned implementation of that model.
 
 ### quote
-
+Used to enable or disable quoting for column names.
 
 ### Data tests
+Defines assertions about a column, table, or view. 
 
+Generic tests: not_null, unique, accepted_values, relationships. 
+
+Can apply to a expression. 
+
+Can use custom generic test. 
 
 ### versions
-
-
+skipped. 
 
 
 ## General configs
