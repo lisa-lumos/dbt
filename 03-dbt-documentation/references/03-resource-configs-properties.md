@@ -54,8 +54,56 @@ Can use custom generic test.
 ### versions
 skipped. 
 
-
 ## General configs
+### access
+The access level of the model.
+
+private/protected/public. 
+
+### alias
+A custom alias for a model/seed/snapshot/test
+
+### database
+
+
+### enabled
+
+
+### full_refresh
+
+
+### contract
+
+
+### grants
+
+
+### group
+
+
+### docs
+
+
+### persist_docs
+
+
+### pre-hook & post-hook
+
+
+### schema
+
+
+### tags
+
+
+### meta
+
+
+### Advanced usage
+
+
+### Using the + prefix
+
 
 
 
