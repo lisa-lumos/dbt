@@ -108,8 +108,9 @@ The leading + is only required, when you need to disambiguate between resource p
 - A config shares a key with part of a resource path, e.g., if you had a directory of models named tags.
 
 ## For models
+Models properties can be declared in ".yml" files in your "models/" directory.
 
-
+You can name these files "whatever_you_want.yml", and nest them arbitrarily deeply in subfolders within the "models/" directory.
 
 ## For seeds
 
