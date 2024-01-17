@@ -113,8 +113,13 @@ Models properties can be declared in ".yml" files in your "models/" directory.
 You can name these files "whatever_you_want.yml", and nest them arbitrarily deeply in subfolders within the "models/" directory.
 
 ## For seeds
+Seed properties can be declared in ".yml" files under a `seed` key.
 
+We recommend that you put them in the "seeds/" directory. You can name these files "whatever_you_want.yml", and nest them arbitrarily deeply in subfolders within that directory.
 
+You can optionally specify the database type of columns in a seed, by providing a dictionary where the keys are the column names, and the values are a valid datatype. Use this configuration only when required, i.e. when the type inference is not working as expected.
+
+You can customize the delimiter in a seed. Default is comma. 
 
 ## For snapshots
 
