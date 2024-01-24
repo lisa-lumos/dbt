@@ -122,8 +122,7 @@ You can optionally specify the database type of columns in a seed, by providing 
 You can customize the delimiter in a seed. Default is comma. 
 
 ## For snapshots
-
-
+You can create your own snapshot strategy, other than the existing timestamp and check. 
 
 ## For tests
 
