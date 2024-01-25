@@ -125,7 +125,9 @@ You can customize the delimiter in a seed. Default is comma.
 You can create your own snapshot strategy, other than the existing timestamp and check. 
 
 ## For tests
+By default, the count of rows is returned by the test query: the default value of `fail_calc` is `count(*)`. But it can also be a custom calculation.
 
+You can limit the number of failures returned by a test query. 
 
 
 ## For sources
