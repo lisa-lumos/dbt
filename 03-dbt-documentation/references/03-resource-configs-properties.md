@@ -129,6 +129,11 @@ By default, the count of rows is returned by the test query: the default value o
 
 You can limit the number of failures returned by a test query. 
 
+You can configure tests to return warnings instead of errors, or to make the test status conditional on the number of failures returned. 
+
+You can set to store failures in the database. 
+
+You can also use where clause in tests, such as only testing past 3 days of data for uniqueness. 
 
 ## For sources
 
