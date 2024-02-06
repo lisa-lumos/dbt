@@ -136,49 +136,6 @@ You can set to store failures in the database.
 You can also use where clause in tests, such as only testing past 3 days of data for uniqueness. 
 
 ## For sources
-
-
-
 ## For analyses
-
-
-
 ## For exposures
-
-
-
 ## For macros
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
