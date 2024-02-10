@@ -25,12 +25,9 @@ One of the greatest underlying assumptions about dbt, is that its operations sho
 
 dbt can leverage artifacts from a prior invocation, as long as their file path is passed to the `--state` flag. 
 
+Another element of job state is the `result` of a prior dbt invocation. After executing a dbt run, dbt creates the run_results.json artifact, which contains execution times and success/error status for dbt models. 
 
-
-
-
-
-
+When a job is selected, dbt Cloud will surface the artifacts from that job's most recent successful run. dbt will then use those artifacts to determine the set of `fresh` sources. In your job commands, you can signal to dbt to run and test only on these fresher sources and their children, by including the `source_status:fresher+` argument. This requires both previous and current state to have the sources.json artifact be available. 
 
 ### Graph operators
 
