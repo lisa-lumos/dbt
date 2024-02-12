@@ -30,7 +30,17 @@ Another element of job state is the `result` of a prior dbt invocation. After ex
 When a job is selected, dbt Cloud will surface the artifacts from that job's most recent successful run. dbt will then use those artifacts to determine the set of `fresh` sources. In your job commands, you can signal to dbt to run and test only on these fresher sources and their children, by including the `source_status:fresher+` argument. This requires both previous and current state to have the sources.json artifact be available. 
 
 ### Graph operators
+```
+dbt run --select my_model+         # select my_model and all children
+dbt run --select +my_model         # select my_model and all parents
+dbt run --select +my_model+        # select my_model, and all of its parents and children
 
+dbt run --select my_model+1        # select my_model and its first-degree children
+dbt run --select 2+my_model        # select my_model, its first-degree parents, and its second-degree parents (grandparents)
+dbt run --select 3+my_model+4      # select my_model, its parents up to the 3rd degree, and its children down to the 4th degree
+
+dbt run --models @my_model         # select my_model, its children, and the parents of its children
+```
 
 ### Set operators
 
