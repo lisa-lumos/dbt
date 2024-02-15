@@ -43,10 +43,21 @@ dbt run --models @my_model         # select my_model, its children, and the pare
 ```
 
 ### Set operators
+space ` ` between arguments means union, while comma `,` between arguments means intersection. 
 
+```
+dbt run --select "+snowplow_sessions +fct_orders" # union (or)
+
+dbt run --select "stg_invoices+,stg_accounts+"    # intersection (and)
+dbt run --select "marts.finance,tag:nightly"      # intersection (and)
+```
 
 ### Exclude
+Models specified with the `--exclude` flag will be removed from the set of models selected with `--select`.
 
+```
+dbt run --select "my_package".*+ --exclude "my_package.a_big_model+"    # select all models in my_package and their children, except a_big_model and its children
+```
 
 ### Methods
 
