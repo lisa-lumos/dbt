@@ -60,6 +60,73 @@ dbt run --select "my_package".*+ --exclude "my_package.a_big_model+"    # select
 ```
 
 ### Methods
+Such as tag, source, ...
+
+Examples:
+
+```
+dbt run --select "tag:nightly"    # run all models with the nightly tag
+
+dbt run --select "source:snowplow+"    # run all models downstream of Snowplow sources
+
+dbt build --select "resource_type:exposure"    # build all resources upstream of exposures
+dbt list --select "resource_type:test"    # list all tests in your project
+
+# These two selectors are equivalent
+dbt run --select "path:models/staging/github"
+dbt run --select "models/staging/github"
+
+# These two selectors are equivalent
+dbt run --select "path:models/staging/github/stg_issues.sql"
+dbt run --select "models/staging/github/stg_issues.sql"
+
+dbt run --select "package:snowplow"
+
+dbt run --select "config.materialized:incremental" # run all models that are materialized incrementally
+
+dbt test --select "test_type:generic"        # run all generic tests
+dbt test --select "test_type:singular"       # run all singular tests
+
+dbt test --select "test_name:unique"            # run all instances of the `unique` test
+dbt test --select "test_name:equality"          # run all instances of the `dbt_utils.equality` test
+dbt test --select "test_name:range_min_max"     # run all instances of a custom schema test defined in the local project, `range_min_max`
+
+dbt test --select "state:new "           # run all tests on new models + and new tests on old models
+dbt run --select "state:modified"        # run all models that have been modified
+dbt ls --select "state:modified"         # list all modified nodes (not just models)
+
+dbt run --select "+exposure:weekly_kpis"                # run all models that feed into the weekly_kpis exposure
+dbt test --select "+exposure:*"                         # test all resources upstream of all exposures
+dbt ls --select "+exposure:*" --resource-type source    # list all sources upstream of all exposures
+
+dbt build --select "+metric:weekly_active_users"       # build all resources upstream of weekly_active_users metric
+dbt ls    --select "+metric:*" --resource-type source  # list all source tables upstream of all metrics
+
+dbt run --select "result:error" --state path/to/artifacts # run all models that generated errors on the prior invocation of dbt run
+dbt test --select "result:fail" --state path/to/artifacts # run all tests that failed on the prior invocation of dbt test
+dbt build --select "1+result:fail" --state path/to/artifacts # run all the models associated with failed tests from the prior invocation of dbt build
+dbt seed --select "result:error" --state path/to/artifacts # run all seeds that generated errors on the prior invocation of dbt seed.
+
+# You can also set the DBT_STATE environment variable instead of the --state flag.
+dbt source freshness # must be run again to compare current to previous state
+dbt build --select "source_status:fresher+" --state path/to/prod/artifacts
+
+dbt run --select "group:finance" # run all models that belong to the finance group.
+
+dbt list --select "access:public"      # list all public models
+dbt list --select "access:private"       # list all private models
+dbt list --select "access:protected"       # list all protected models
+
+dbt list --select "version:latest"      # only 'latest' versions
+dbt list --select "version:prerelease"  # versions newer than the 'latest' version
+dbt list --select version:old         # versions older than the 'latest' version
+dbt list --select "version:none"        # models that are *not* versioned
+
+dbt list --select semantic_model:*        # list all semantic models 
+dbt list --select +semantic_model:orders  # list your semantic model named "orders" and all upstream resources
+
+```
+
 
 
 ### Putting it together
