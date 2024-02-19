@@ -127,18 +127,52 @@ dbt list --select +semantic_model:orders  # list your semantic model named "orde
 
 ```
 
-
-
 ### Putting it together
-
+skipped
 
 ### YAML Selectors
-
+Write resource selectors in YAML, save them with a human-friendly name, and reference them using the `--selector` flag.
 
 ### Test selection examples
+```console
+dbt test --select "test_type:generic"
+dbt test --select "test_type:singular"
 
+# eager mode:
+dbt test --select "orders"
+dbt build --select "orders"
+
+# cautious:
+dbt test --select "orders" --indirect-selection=cautious
+dbt build --select "orders" --indirect-selection=cautious
+
+# buildable:
+dbt test --select "orders" --indirect-selection=buildable
+dbt build --select "orders" --indirect-selection=buildable
+
+# Empty:
+dbt test --select "orders" --indirect-selection=empty
+dbt build --select "orders" --indirect-selection=empty
+
+```
+
+The modes to configure the behavior when performing indirect selection:
+1. eager (default) - include ANY test that references the selected nodes, even if it references other models as well.
+2. cautious - restrict to tests that ONLY refer to selected nodes
+3. buildable - restrict to tests that ONLY refer to selected nodes, or their ancestors
+4. empty - restrict to tests that are only for the selected node, and ignore all tests from the attached nodes
+
+The "buildable", "cautious", and "empty" modes can be useful in environments when you're only building a subset of your DAG, and you want to avoid test failures in "eager" mode caused by unbuilt resources. (Another way to achieve this is with deferral).
 
 ### Defer
+
+
+
+
+
+
+
+
 
 
 ### Caveats to state comparison
