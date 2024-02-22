@@ -165,17 +165,12 @@ The modes to configure the behavior when performing indirect selection:
 The "buildable", "cautious", and "empty" modes can be useful in environments when you're only building a subset of your DAG, and you want to avoid test failures in "eager" mode caused by unbuilt resources. (Another way to achieve this is with deferral).
 
 ### Defer
-
-
-
-
-
-
-
-
-
+Defer is a powerful feature that makes it possible to run a subset of models or tests in a sandbox environment, without having to first build their upstream parents. This can save time and computational resources when you want to test a small number of models in a large project.
 
 ### Caveats to state comparison
+Only seeds <1mb can be detected for changes. 
+
+vars change cannot be detected. 
 
 ## List of commands
 
