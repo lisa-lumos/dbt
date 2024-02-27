@@ -173,6 +173,95 @@ Only seeds <1mb can be detected for changes.
 vars change cannot be detected. 
 
 ## List of commands
+### build
+The dbt build command will:
+- run models
+- test tests
+- snapshot snapshots
+- seed seeds
+
+Tests on upstream resources will block downstream resources from running, and a test failure will cause those downstream resources to skip entirely. Adjust its severity or thresholds to warn instead of error, to avoid skipping. 
+
+### clean
+Deletes all folders specified in the "clean-targets" list specified in "dbt_project.yml". 
+
+Doesn't work for dbt Cloud. 
+
+### clone
+
+
+
+### docs
+
+
+
+### compile
+
+
+
+### debug
+
+
+
+### deps
+
+
+
+### environment
+
+
+
+### init
+
+
+
+### ls (list)
+
+
+
+### parse
+
+
+
+### retry
+
+
+
+### rpc
+
+
+
+### run
+
+
+
+### run-operation
+
+
+
+### seed
+
+
+
+### show
+
+
+
+### snapshot
+
+
+
+### source
+
+
+
+### test
+
+
+
+### version
+
+
 
 
 
