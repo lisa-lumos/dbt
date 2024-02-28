@@ -188,12 +188,13 @@ Deletes all folders specified in the "clean-targets" list specified in "dbt_proj
 Doesn't work for dbt Cloud. 
 
 ### clone
-
-
+The dbt clone command clones selected nodes from the specified state to the target schema(s). This command makes use of the clone materialization. 
 
 ### docs
-
-
+The command is responsible for generating your project's documentation website by:
+1. Copying the website "index.html" file into the "target/" directory
+2. Compiling the resources in your project, so that their compiled_code will be included in "manifest.json"
+3. Running queries against database metadata to produce the "catalog.json" file, which contains metadata about the tables and views produced by the models in your project.
 
 ### compile
 
