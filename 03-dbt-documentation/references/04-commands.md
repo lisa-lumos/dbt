@@ -197,16 +197,17 @@ The command is responsible for generating your project's documentation website b
 3. Running queries against database metadata to produce the "catalog.json" file, which contains metadata about the tables and views produced by the models in your project.
 
 ### compile
+Generates executable SQL from source model/test/analysis files. You can find these compiled SQL files in the "target/" directory of your dbt project.
 
-
+Starting in dbt v1.5, compile can be "interactive" in the CLI, by displaying the compiled code of a node, or arbitrary dbt-SQL query. 
 
 ### debug
-
-
+Test the database connection, and display information for debugging purposes, such as the validity of your project file, and your installation of any requisite dependencies. 
 
 ### deps
+Pulls the most recent version of the dependencies listed in your "packages.yml" from git.
 
-
+Starting in dbt Core v1.7, dbt generates a "package-lock.yml" file in the root of your project. 
 
 ### environment
 
