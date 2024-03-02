@@ -210,12 +210,12 @@ Pulls the most recent version of the dependencies listed in your "packages.yml" 
 Starting in dbt Core v1.7, dbt generates a "package-lock.yml" file in the root of your project. 
 
 ### environment
-
-
+Enables you to interact with your dbt Cloud environment. Can be used for:
+- Viewing your local config details (account ID, active project ID, deployment environment, ...).
+- Viewing your dbt Cloud config details (environment ID, environment name, connection type, ...).
 
 ### init
-
-
+Initializes a dbt core project. 
 
 ### ls (list)
 
