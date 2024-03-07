@@ -218,60 +218,42 @@ Enables you to interact with your dbt Cloud environment. Can be used for:
 Initializes a dbt core project. 
 
 ### ls (list)
-
-
+Lists resources in your dbt project.
 
 ### parse
-
-
+parses and validates the contents of your dbt project. If your project contains Jinja or YAML syntax errors, the command will fail.
 
 ### retry
-
-
+Re-executes the last dbt command, from the node point of failure. 
 
 ### rpc
-
-
+(deprecated)
 
 ### run
-
-
+Executes compiled sql model files against the current target database. 
 
 ### run-operation
-
-
+Used to invoke a macro.
 
 ### seed
-
-
+skipped. 
 
 ### show
-
-
+Preview a model/test/analysis in terminal. 
 
 ### snapshot
-
-
+skipped
 
 ### source
-
-
+Test source freshness. 
 
 ### test
-
-
+Runs tests defined on models/sources/snapshots/seeds.
 
 ### version
+The currently installed version of dbt Core, or the dbt Cloud CLI.
 
-
-
-
-
-## Global configs
-
-
-
-## Global CLI flags
+## Flags (global configs)
 
 
 
