@@ -254,8 +254,29 @@ Runs tests defined on models/sources/snapshots/seeds.
 The currently installed version of dbt Core, or the dbt Cloud CLI.
 
 ## Flags (global configs)
+Configurations for fine-tuning how dbt runs your project.
 
+Logs: how dbt's logs should be formatted, the minimum severity of events captured in the console and file logs, suppress non-error logs in output, etc. 
 
+Cache
+
+Failing fast
+
+JSON artifacts
+
+Legacy behaviors
+
+Parsing
+
+Print output
+
+Record timing info
+
+Anonymous usage stats
+
+Checking version compatibility
+
+Warnings
 
 ## Events and logs
 
