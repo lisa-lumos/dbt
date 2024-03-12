@@ -258,25 +258,25 @@ Configurations for fine-tuning how dbt runs your project.
 
 Logs: how dbt's logs should be formatted, the minimum severity of events captured in the console and file logs, suppress non-error logs in output, etc. 
 
-Cache
+Cache: skipped. 
 
-Failing fast
+Failing fast: make dbt exit immediately if a single resource fails to build. If other models are in-progress when the first model fails, then dbt will terminate the connections for these still-running models.
 
-JSON artifacts
+JSON artifacts: determines whether dbt writes JSON artifacts
 
-Legacy behaviors
+Legacy behaviors: skipped
 
-Parsing
+Parsing: partial parsing; static parser
 
-Print output
+Print output: deprecated. 
 
-Record timing info
+Record timing info: saves performance profiling information to a file.
 
-Anonymous usage stats
+Anonymous usage stats: skipped. 
 
 Checking version compatibility
 
-Warnings
+Warnings: convert dbt warnings into errors.
 
 ## Events and logs
 
