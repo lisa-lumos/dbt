@@ -279,28 +279,15 @@ Checking version compatibility
 Warnings: convert dbt warnings into errors.
 
 ## Events and logs
-
-
+For debug logs. 
 
 ## Exit codes
-
-
+skipped. 
 
 ## Project Parsing
+Parsing: At the start of every dbt invocation, dbt reads all the files in your project, extracts information, and constructs a manifest containing every object. 
 
-
+There are ways to make this process faster, but each have their own limitations. 
 
 ## Programmatic invocations
-
-
-
-
-
-
-
-
-
-
-
-
-
+You can call dbt run etc from Python. 
