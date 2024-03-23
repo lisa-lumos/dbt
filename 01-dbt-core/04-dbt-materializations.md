@@ -8,10 +8,8 @@
 In the "models" folder, create a new folder "dim". Inside it, create a new file "models/dim/dim_listings_cleansed.sql":
 ```sql
 with src_listings as (
-  select
-    *
-  from
-    {{ ref('src_listings') }}
+  select *
+  from {{ ref('src_listings') }}
 )
 
 select
@@ -26,8 +24,7 @@ select
   replace(price_str, '$') :: number(10,2) as price, -- rmv $ sign in the string, and convert to number
   created_at,
   updated_at
-from
-  src_listings
+from src_listings
 ```
 
 Note the reference used in it. dbt heavily relies on Jinja. 
@@ -35,10 +32,8 @@ Note the reference used in it. dbt heavily relies on Jinja.
 And another model "models/dim/dim_hosts_cleansed.sql":
 ```sql
 with src_hosts as (
-  select
-    *
-  from
-    {{ ref('src_hosts') }}
+  select *
+  from {{ ref('src_hosts') }}
 )
 
 select
@@ -47,8 +42,7 @@ select
   is_superhost,
   created_at,
   updated_at
-from
-  src_hosts
+from src_hosts
 ```
 
 `dbt run` now will create all 5 models from scratch. 
@@ -77,18 +71,13 @@ Add model "models/fct/fct_reviews.sql":
 }}
 
 with src_reviews as (
-  select 
-    * 
-  from 
-    {{ ref('src_reviews') }}
+  select * 
+  from  {{ ref('src_reviews') }}
 )
 
-select 
-  * 
-from 
-  src_reviews
-where 
-  review_text is not null
+select * 
+from src_reviews
+where review_text is not null
 
 {% if is_incremental() %}
   and 
@@ -103,14 +92,14 @@ Now run `dbt run`, and obtain the 3 views and 3 tables in snowflake.
 
 To simulate new recording being added to raw data, manually execute below in snowflake:
 ```sql
-insert into 
-  airbnb.raw.raw_reviews
+insert into airbnb.raw.raw_reviews
 values (
   3176, 
   current_timestamp(), 
   'Zoltan', 
   'excellent stay!', 
-  'positive')
+  'positive'
+)
 ;
 ```
 
@@ -151,17 +140,13 @@ Inside the dim folder, create "models/dim/dim_listings_w_hosts.sql":
 ```sql
 with
 l as (
-  select
-    *
-  from
-    {{ ref('dim_listings_cleansed') }}
+  select *
+  from {{ ref('dim_listings_cleansed') }}
 ),
 
 h as (
-  select 
-    *
-  from 
-    {{ ref('dim_hosts_cleansed') }}
+  select *
+  from {{ ref('dim_hosts_cleansed') }}
 )
 
 select
@@ -175,11 +160,9 @@ select
   h.is_superhost as host_is_superhost,
   l.created_at,
   greatest(l.updated_at, h.updated_at) as updated_at
-from 
-  l
-  left join 
-  h 
-  on (h.host_id = l.host_id)
+from l 
+left join h 
+on h.host_id = l.host_id
 ```
 
 Now do `dbt run`, and see the new fact table. 
