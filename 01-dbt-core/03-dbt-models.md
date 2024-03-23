@@ -12,10 +12,8 @@ Given 3 tables sitting in the raw layer now, the first cleansing step is to crea
 Construct first query as:
 ```sql
 with raw_listings as (
- select
-   *
- from
-   airbnb.raw.raw_listings
+ select *
+ from airbnb.raw.raw_listings
 )
 
 select
@@ -62,10 +60,8 @@ Do similar things to the other two raw tables.
 "models/src/src_reviews.sql":
 ```sql
 with raw_reviews as (
-  select
-    *
-  from
-    airbnb.raw.raw_reviews
+  select *
+  from airbnb.raw.raw_reviews
 )
 
 select
@@ -74,17 +70,14 @@ select
   reviewer_name,
   comments as review_text,
   sentiment as review_sentiment
-from
-  raw_reviews
+from raw_reviews
 ```
 
 "models/src/src_hosts.sql":
 ```sql
 with raw_hosts as (
-  select
-    *
-  from
-    airbnb.raw.raw_hosts
+  select *
+  from airbnb.raw.raw_hosts
 )
 
 select
@@ -93,8 +86,7 @@ select
   is_superhost,
   created_at,
   updated_at
-from
-  raw_hosts
+from raw_hosts
 ```
 
 And do `dbt run` to build all 3 views:
