@@ -36,17 +36,13 @@ Create a "mart" folder inside the "models" folder. This folder will be accessed 
 }}
 
 with fct_reviews as (
-  select 
-    * 
-  from 
-    {{ ref('fct_reviews') }}
+  select * 
+  from {{ ref('fct_reviews') }}
 ),
 
 full_moon_dates as (
-  select 
-    * 
-  from 
-    {{ ref('seed_full_moon_dates') }} -- refer to seeds directly, like a model
+  select * 
+  from {{ ref('seed_full_moon_dates') }} -- refer to seeds directly, like a model
 )
 
 select
@@ -55,12 +51,9 @@ select
     when fm.full_moon_date is null then 'not full moon'
     else 'full moon'
   end as is_full_moon
-from
-  fct_reviews r
-  left join 
-  full_moon_dates fm
-  on 
-    to_date(r.review_date) = dateadd(day, 1, fm.full_moon_date)
+from fct_reviews r
+left join full_moon_dates fm
+  on to_date(r.review_date) = dateadd(day, 1, fm.full_moon_date)
 ```
 
 Sources can be defined in yaml files in the "models" folder. Create a "models/sources.yml":
@@ -84,29 +77,26 @@ With this, you can then name your raw tables as "source tables", and use their n
 Rewrite the 3 models in "src" folder, "models/src/src_hosts.sql":
 ```sql
 with raw_hosts as (
-  select
-    *
-  from
-    {{ source('airbnb', 'hosts')}} -- airbnb.raw.raw_hosts
+  select *
+  from {{ source('airbnb', 'hosts')}} -- airbnb.raw.raw_hosts
 )
+
 select
   id as host_id,
   name as host_name,
   is_superhost,
   created_at,
   updated_at
-from
-  raw_hosts
+from raw_hosts
 ```
 
 "models/src/src_listings.sql":
 ```sql
 with raw_listings as (
- select
-   *
- from
-   {{ source('airbnb', 'listings')}} -- airbnb.raw.raw_listings
+  select *
+  from {{ source('airbnb', 'listings')}} -- airbnb.raw.raw_listings
 )
+
 select
   id as listing_id,
   name as listing_name,
@@ -117,17 +107,14 @@ select
   price as price_str,
   created_at,
   updated_at
-from
-  raw_listings
+from raw_listings
 ```
 
 "models/src/src_reviews.sql":
 ```sql
 with raw_reviews as (
-  select
-    *
-  from
-    {{ source('airbnb', 'reviews')}} -- airbnb.raw.raw_reviews
+  select *
+  from {{ source('airbnb', 'reviews')}} -- airbnb.raw.raw_reviews
 )
 select
   listing_id,
@@ -135,8 +122,7 @@ select
   reviewer_name,
   comments as review_text,
   sentiment as review_sentiment
-from
-  raw_reviews
+from raw_reviews
 ```
 
 Next, to check whether all the templates etc makes sense, run `dbt compile`:
