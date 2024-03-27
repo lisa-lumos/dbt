@@ -22,10 +22,8 @@ In "snapshots" folder, create a new file "snapshots/scd_raw_listings.sql":
   )
 }}
 
-select 
-  * 
-from 
-  {{ source('airbnb', 'listings') }}
+select * 
+from {{ source('airbnb', 'listings') }}
 
 {% endsnapshot %}
 ```
@@ -52,13 +50,11 @@ Note the new cols in this "scd_raw_listings" table - "dbt_valid_from" col have s
 
 If we make an update to the raw table from Snowflake:
 ```sql
-update 
-  airbnb.raw.raw_listings 
+update airbnb.raw.raw_listings 
 set 
   minimum_nights = 30,
   updated_at = current_timestamp() 
-where 
-  id = 3176
+where id = 3176
 ;
 ```
 
@@ -85,10 +81,8 @@ Similarly, create "snapshots/scd_raw_hosts.sql":
   )
 }}
 
-select 
-  * 
-from 
-  {{ source('airbnb', 'hosts') }}
+select * 
+from {{ source('airbnb', 'hosts') }}
 
 {% endsnapshot %}
 ```
