@@ -432,7 +432,7 @@ transformed as (
 select * from transformed
 ```
 
-Run the model `dbt run -m +fct_customer_orders` and correct errors, if any. 
+Run the model `dbt run -s +fct_customer_orders` and correct errors, if any. 
 
 ## CTEs, or intermediate models?
 "models/marts/intermediate/int_orders.sql":
