@@ -45,7 +45,7 @@ Run `dbt test`:
 21:40:18  Done. PASS=2 WARN=0 ERROR=0 SKIP=0 TOTAL=2
 ```
 
-Can see both tests have passed. "target/compiled/dbtlearn/models/schema.yml" folder contains compiled tests, which are sql commands that dbt runs behind the scene. If you a test did not pass, dbt will show the sql file's path that had an error. 
+Can see both tests have passed. "target/compiled/dbtlearn/models/schema.yml" folder contains compiled tests, which are sql commands that dbt runs behind the scene. If a test did not pass, dbt will show the sql file's path that had an error. 
 
 Similarly, add tests for other cols in the same file "models/schema.yml":
 ```yml

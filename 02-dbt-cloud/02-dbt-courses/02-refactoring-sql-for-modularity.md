@@ -177,7 +177,7 @@ on orders.id = payments.orderid
 where payments.status != 'fail'
 ```
 
-Run `dbt run -m customer_orders`, to see if the query is right. 
+Run `dbt run -s customer_orders`, to see if the query is right. 
 
 Run `dbt docs generate`, check the sources in the DAG. 
 
