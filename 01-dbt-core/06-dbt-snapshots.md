@@ -58,7 +58,7 @@ where id = 3176
 ;
 ```
 
-And run `dbt snapshot` to update the snapshot, then in Snowflake run`select * from airbnb.dev.scd_raw_listings where id=3176;`, we can then see these 2 records:
+And run `dbt snapshot` to update the snapshot, then in Snowflake run `select * from airbnb.dev.scd_raw_listings where id=3176;`, we can then see these 2 records:
 ```
 ID    ...  UPDATED_AT               DBT_SCD_ID                        DBT_UPDATED_AT           DBT_VALID_FROM           DBT_VALID_TO
 3176  ...  2023-06-07 12:47:13.948  fa6d509ef4e446916277df0a755c73ac  2023-06-07 12:47:13.948  2023-06-07 12:47:13.948  NULL
